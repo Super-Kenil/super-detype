@@ -16,13 +16,13 @@ async function processFiles (directory: string) {
       if (fs.statSync(filePath).isDirectory()) {
         await processFiles(filePath)
       } else {
-        if (file.endsWith('.ts') || file.endsWith('.tsx')) {
+        if (file.endsWith('.js') || file.endsWith('.jsx')) {
           const fileContent = await fs.readFile(filePath, { encoding: 'utf-8' })
           const typesRemovedContent = await removeTypes(fileContent, false)
-
+          console.log('filepath', filePath)
           await fs.writeFile(filePath, typesRemovedContent, { encoding: 'utf-8', })
-          console.log(`Content of ${file}:`)
-          console.log(fileContent)
+          // console.log(`Content of ${file}:`)
+          // console.log(fileContent)
         }
       }
     }
