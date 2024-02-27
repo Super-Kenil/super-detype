@@ -1,0 +1,14 @@
+.react-select__control {
+  @apply cursor-pointer py-2.5 px-4;
+}
+
+.react-select__menu {
+  @apply bg-white drop-shadow-lg rounded-lg overflow-hidden !start-0 mt-2 dark:bg-default-100;
+}
+.react-select__menu .react-select__menu-list {
+  @apply py-1;
+}
+
+.react-select__menu .react-select__menu-list .react-select__option {
+  @apply py-1.5 px-4 hover:bg-primary/10 hover:text-primary cursor-pointer;
+}

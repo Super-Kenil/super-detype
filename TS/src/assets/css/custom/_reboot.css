@@ -1,0 +1,24 @@
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Delicious+Handrawn&display=swap");
+
+html {
+  @apply relative scroll-smooth;
+}
+
+body {
+  font-size: 15px;
+  -webkit-tap-highlight-color: transparent;
+  @apply font-poppins overflow-x-hidden antialiased text-base bg-white text-default-800 dark:bg-default-50;
+}
+a,button{
+  @apply focus-visible:outline outline-offset-2  outline-1 outline-primary;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+::marker {
+  @apply opacity-40;
+}
+

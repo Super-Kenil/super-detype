@@ -1,0 +1,81 @@
+.filepond--file-action-button {
+  @apply cursor-pointer
+}
+
+.filepond--drop-label {
+  color: #555;
+}
+
+.filepond--label-action {
+  text-decoration-color: #aaa;
+}
+
+.filepond--panel-root {
+  background-color: #eee;
+}
+
+.filepond--panel-root {
+  border-radius: 0.5em;
+  @apply !bg-primary-500/10 !border-dashed !border-primary-500;
+
+}
+
+.filepond--root {
+  @apply !mb-0
+}
+
+.filepond--item-panel {
+  border-radius: 0.5em;
+}
+
+.filepond--item-panel {
+  background-color: #555;
+}
+
+.filepond--drip-blob {
+  @apply bg-white
+}
+
+.filepond--file-action-button {
+  background-color: #00000080;
+}
+
+.filepond--file-action-button {
+  @apply text-white
+}
+
+/* the color of the focus ring */
+.filepond--file-action-button:hover,
+.filepond--file-action-button:focus {
+  box-shadow: 0 0 0 0.125em #ffffffe6;
+}
+
+/* the text color of the file status and info labels */
+.filepond--file {
+  @apply text-white
+}
+
+/* error state color */
+[data-filepond-item-state*='error'] .filepond--item-panel,
+[data-filepond-item-state*='invalid'] .filepond--item-panel {
+  @apply bg-red-500
+}
+
+[data-filepond-item-state='processing-complete'] .filepond--item-panel {
+  @apply bg-green-500
+}
+
+/* bordered drop area */
+.filepond--panel-root {
+  background-color: transparent;
+  border: 2px solid #2c3340;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+  transition: background-color 0s 600000s, color 0s 600000s;
+}
+
+.filepond--credits {
+  display: none;
+}

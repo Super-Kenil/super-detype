@@ -1,0 +1,32 @@
+{
+    "theme_color": "#F58220",
+    "background_color": "#F58220",
+    "display": "fullscreen",
+    "scope": "/",
+    "start_url": "/",
+    "name": "Yum Tailwind Next",
+    "short_name": "Yum Next",
+    "description": "Yum - Tailwind CSS Client & Admin Food Template - Retail Site Templates. Introducing 'Yum', our latest food template, meticulously crafted with the power of Tailwind CSS 3. This template offers a comprehensive solution for both clients and administrators in the culinary world. For clients, it provides a seamless and delightful experience for ordering and enjoying their favourite meals. With a user-friendly interface and responsive design, it\u2019s easy to explore menus, place orders, and savour delicious dishes from the comfort of their homes. For administrators, this template streamlines the management of the food business, from menu updates to order tracking, ensuring efficiency and success. Tailwind CSS 3 ensures that the template is not only functional but also beautifully designed. Experience the perfect blend of culinary excellence and cutting-edge design with 'Yum', our Tailwind CSS 3 food template, where clients and admins unite for a delectable online dining experience.",
+    "icons": [
+        {
+            "src": "/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-384x384.png",
+            "sizes": "384x384",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

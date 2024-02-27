@@ -1,0 +1,12 @@
+.menu .hs-dropdown-menu {
+  .active {
+    @apply bg-default-200/50;
+  }
+}
+
+.admin-menu {
+
+  .hs-accordion-toggle.active {
+    @apply !text-default-700 !bg-default-200/50;
+  }
+}

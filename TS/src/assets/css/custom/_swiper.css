@@ -1,0 +1,21 @@
+/* Swiper */
+.swiper.cart-swiper-pagination .swiper-wrapper .swiper-slide {
+  @apply border-2 border-transparent rounded-lg;
+
+  &.swiper-slide-thumb-active {
+    @apply border-primary;
+  }
+}
+
+.swiper-pagination-bullet-active{
+  @apply bg-primary;
+}
+
+/* Clients */
+.clients-testimonial-pagination .swiper-slide {
+  @apply scale-100 ring-2 ring-transparent rounded-full transition-all;
+}
+
+.clients-testimonial-pagination .swiper-slide.swiper-slide-thumb-active {
+  @apply scale-125 ring-primary;
+}

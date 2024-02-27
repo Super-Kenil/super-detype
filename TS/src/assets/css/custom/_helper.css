@@ -1,0 +1,29 @@
+
+.page-content {
+  @apply lg:min-h-[calc(100vh-146px)];
+}
+
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+  width: 5px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-default-900/10 border-2 border-default-900/10 rounded-lg;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent rounded-lg;
+}
+
+::-webkit-scrollbar-corner {
+  @apply bg-transparent;
+}

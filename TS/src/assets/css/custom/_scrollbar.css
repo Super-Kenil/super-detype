@@ -1,0 +1,23 @@
+::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+::-webkit-scrollbar:vertical {
+  width: 5px;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  @apply rounded-lg bg-transparent;
+}
+
+::-webkit-scrollbar-corner {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-primary-400 rounded-full hover:bg-primary-500;
+}

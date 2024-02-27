@@ -1,0 +1,108 @@
+.ql-editor {
+    @apply text-start;
+
+    ol,
+    ul {
+        @apply ps-3 pe-0;
+    }
+
+    li:not(.ql-direction-rtl)::before {
+        @apply -ms-3 me-2 text-end;
+    }
+}
+
+.ql-toolbar {
+    &.ql-snow {
+        @apply border border-default-200;
+    }
+}
+
+.ql-container {
+    &.ql-snow {
+        @apply rounded-b-lg border border-default-200;
+    }
+}
+
+.ql-bubble {
+    @apply border border-default-200 rounded-lg;
+}
+
+.ql-toolbar {
+    span {
+        @apply !outline-none text-default-900;
+
+        &:hover {
+            @apply text-primary;
+        }
+    }
+
+    &.ql-snow {
+        @apply border rounded-t-lg;
+
+        .ql-picker.ql-expanded {
+            .ql-picker-label {
+                @apply border-transparent;
+            }
+        }
+
+        .ql-picker-options {
+            @apply shadow rounded;
+        }
+    }
+}
+
+.ql-snow {
+
+    .ql-stroke,
+    .ql-script,
+    .ql-strike svg {
+        @apply stroke-default-600;
+    }
+
+    .ql-fill {
+        @apply text-default-900;
+    }
+
+    .ql-picker:not(.ql-color-picker):not(.ql-icon-picker) {
+        svg {
+            @apply end-0 start-auto;
+        }
+    }
+
+    .ql-picker {
+        &.ql-expanded .ql-picker-label {
+            @apply text-default-900;
+        }
+    }
+}
+
+.ql-snow {
+    .ql-picker-options {
+        @apply bg-white dark:bg-default-50 border border-default-200;
+    }
+}
+
+.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
+    @apply border border-default-200;
+}
+
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button:focus,
+.ql-snow .ql-toolbar button:focus,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active,
+.ql-snow.ql-toolbar .ql-picker-item:hover,
+.ql-snow .ql-toolbar .ql-picker-item:hover,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+    @apply text-primary;
+
+    .ql-stroke{
+        @apply stroke-primary;
+    }
+}

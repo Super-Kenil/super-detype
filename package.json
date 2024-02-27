@@ -1,0 +1,28 @@
+{
+  "name": "ts-compiler",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm App.ts"
+  },
+  "keywords": [],
+  "author": "Super-Kenil",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/fs-extra": "^11.0.4",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "commander": "^12.0.0",
+    "express": "^4.18.2",
+    "fs-extra": "^11.2.0",
+    "glob": "^10.3.10",
+    "remove-types": "^1.0.0"
+  }
+}
