@@ -6,7 +6,8 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm App.ts"
+    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm App.ts",
+    "babel-run": "babel --presets @babel/preset-typescript TS/src/app/layout.tsx"
   },
   "keywords": [],
   "author": "Super-Kenil",
@@ -20,7 +21,9 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@babel/cli": "^7.23.9",
     "@babel/core": "^7.24.0",
+    "@babel/plugin-transform-typescript": "^7.23.6",
     "@babel/preset-typescript": "^7.23.3",
     "commander": "^12.0.0",
     "express": "^4.18.2",
