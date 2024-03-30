@@ -1,11 +1,9 @@
 import fs from 'fs-extra'
-import { program } from 'commander'
 import { execSync } from 'child_process'
-import { removeTypes } from 'remove-types'
 import { transformSync } from '@babel/core'
 import * as path from 'path'
-
-const directoryPath = './dist/JS'
+// process.argv[2]
+const directoryPath = process.argv[2]
 
 async function processFiles (directory: string) {
   try {
@@ -26,7 +24,7 @@ async function processFiles (directory: string) {
           })
           // const typesRemovedContent = await removeTypes(fileContent, false)
           console.log('filepath', filePath)
-          await fs.writeFile(filePath, typesRemovedContent?.code ?? 'ERROR: CONVERTING FILE KENIL', { encoding: 'utf-8', })
+          await fs.writeFile(filePath, typesRemovedContent?.code ?? 'ERROR: CONVERTING FILE', { encoding: 'utf-8', })
           // console.log(`Content of ${file}:`)
           // console.log(fileContent)
         }
@@ -41,14 +39,13 @@ async function processFiles (directory: string) {
 }
 
 (async function copy () {
-
   try {
-    fs.copySync('TS', 'dist/JS',)
+    fs.copySync(`${directoryPath}/TS`, `${directoryPath}/JS`)
 
     await processFiles(directoryPath)
 
-    execSync('find ./dist/JS -type f -name "*.tsx" -exec sh -c \'mv "$1" "${1%.tsx}.jsx"\' _ {} \\;')
-    execSync('find ./dist/JS -type f -name "*.ts" -exec sh -c \'mv "$1" "${1%.ts}.js"\' _ {} \\;')
+    execSync(`find '${directoryPath}/JS' -type f -name "*.tsx" -exec sh -c \'mv "$1" "\${1%.tsx}.jsx"\' _ {} \\;`)
+    execSync(`find '${directoryPath}/JS' -type f -name "*.ts" -exec sh -c \'mv "$1" "\${1%.ts}.js"\' _ {} \\;`)
 
   } catch (error) {
     if (error instanceof Error) {
