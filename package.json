@@ -10,7 +10,10 @@
     "babel-run": "babel --presets @babel/preset-typescript TS/src/app/layout.tsx"
   },
   "keywords": [],
-  "author": "Super-Kenil",
+  "author": {
+    "name": "Super Kenil",
+    "url": "https://superkenil.com"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/babel__core": "^7.20.5",
@@ -24,8 +27,6 @@
     "@babel/core": "^7.24.0",
     "@babel/plugin-transform-typescript": "^7.23.6",
     "@babel/preset-typescript": "^7.23.3",
-    "fast-glob": "^3.3.2",
-    "fs-extra": "^11.2.0",
-    "glob": "^10.3.12"
+    "fs-extra": "^11.2.0"
   }
 }
