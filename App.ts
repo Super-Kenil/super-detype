@@ -1,5 +1,5 @@
 import fs from 'fs-extra'
-import { execSync } from 'child_process'
+// import { execSync } from 'child_process'
 import { transformSync } from '@babel/core'
 import * as path from 'path'
 // process.argv[2]
@@ -14,20 +14,28 @@ async function processFiles (directory: string) {
 
       if (fs.statSync(filePath).isDirectory()) {
         await processFiles(filePath)
-      } else {
-        if (file.endsWith('.ts') || file.endsWith('.tsx')) {
-          const fileContent = await fs.readFile(filePath, { encoding: 'utf-8' })
-          const typesRemovedContent = await transformSync(fileContent, {
-            compact: false,
-            presets: ['@babel/preset-typescript'],
-            filename: filePath
-          })
-          // const typesRemovedContent = await removeTypes(fileContent, false)
-          console.log('filepath', filePath)
-          await fs.writeFile(filePath, typesRemovedContent?.code ?? 'ERROR: CONVERTING FILE', { encoding: 'utf-8', })
-          // console.log(`Content of ${file}:`)
-          // console.log(fileContent)
+      } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
+        const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
+        const typesRemovedContent = transformSync(fileContent, {
+          compact: false,
+          presets: ['@babel/preset-typescript'],
+          filename: filePath
+        })
+        // C:\Coding projects\Super-Kenil\ts-compiler\App.ts
+        // const typesRemovedContent = await removeTypes(fileContent, false)
+        // console.log('file', file)
+        console.log('filepath', filePath)
+        let replacedPath = filePath
+        if (file.endsWith('.tsx')) {
+          replacedPath = filePath.substring(0, filePath.lastIndexOf('.tsx')) + '.jsx'
+        } else {
+          replacedPath = filePath.substring(0, filePath.lastIndexOf('.ts')) + '.js'
         }
+        await fs.writeFile(replacedPath, typesRemovedContent?.code ?? 'ERROR: CONVERTING FILE', { encoding: 'utf-8', })
+        await fs.rm(filePath, { force: true })
+        // console.log(`Content of ${file}:`)
+        // console.log(fileContent)
+
       }
     }
 
@@ -40,12 +48,18 @@ async function processFiles (directory: string) {
 
 (async function copy () {
   try {
-    fs.copySync(`${directoryPath}/TS`, `${directoryPath}/JS`)
+    // TODO Make the destination directory dynamic
+    fs.copySync(`${directoryPath}/TS`, `${directoryPath}/JS`, {
+      filter: (src) => {
+        return !src.includes('node_modules')
+      }
+    })
 
-    await processFiles(directoryPath)
+    await processFiles(directoryPath + '/JS')
 
-    execSync(`find '${directoryPath}/JS' -type f -name "*.tsx" -exec sh -c \'mv "$1" "\${1%.tsx}.jsx"\' _ {} \\;`)
-    execSync(`find '${directoryPath}/JS' -type f -name "*.ts" -exec sh -c \'mv "$1" "\${1%.ts}.js"\' _ {} \\;`)
+    // renames .ts and .tsx files to .js and .jsx after removing types
+    // execSync(`find '${directoryPath}/JS' -type f -name "*.tsx" -exec sh -c \'mv "$1" "\${1%.tsx}.jsx"\' _ {} \\;`)
+    // execSync(`find '${directoryPath}/JS' -type f -name "*.ts" -exec sh -c \'mv "$1" "\${1%.ts}.js"\' _ {} \\;`)
 
   } catch (error) {
     if (error instanceof Error) {
