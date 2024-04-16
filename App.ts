@@ -3,7 +3,8 @@ import fs from 'fs-extra'
 import { transformSync } from '@babel/core'
 import * as path from 'path'
 // process.argv[2]
-const directoryPath = process.argv[2]
+const inputPath = process.argv[2]
+const outputPath = process.argv[3]
 
 async function processFiles (directory: string) {
   try {
@@ -49,13 +50,13 @@ async function processFiles (directory: string) {
 (async function copy () {
   try {
     // TODO Make the destination directory dynamic
-    fs.copySync(`${directoryPath}/TS`, `${directoryPath}/JS`, {
+    fs.copySync(inputPath, outputPath, {
       filter: (src) => {
         return !src.includes('node_modules')
       }
     })
 
-    await processFiles(directoryPath + '/JS')
+    await processFiles(outputPath)
 
     // renames .ts and .tsx files to .js and .jsx after removing types
     // execSync(`find '${directoryPath}/JS' -type f -name "*.tsx" -exec sh -c \'mv "$1" "\${1%.tsx}.jsx"\' _ {} \\;`)
