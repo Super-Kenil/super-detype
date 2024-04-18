@@ -15,3 +15,13 @@ Does not support (yet):
 
 No Plans for supporting: 
 * Angular
+
+### How to Use
+* In your terminal
+
+```
+super-detype <typescript-project-directory> <output-directory>
+```
+
+* First arguement is your typescript project's directory
+* Second output should be the destination where you want to save your converted project
