@@ -1,20 +1,30 @@
 {
-  "name": "ts-compiler",
-  "version": "1.0.0",
-  "description": "",
+  "name": "super-detype",
+  "version": "0.1.3",
+  "description": "This package converts your Typescript project to Javascript",
   "type": "module",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --experimental-specifier-resolution=node --loader ts-node/esm App.ts",
-    "babel-run": "babel --presets @babel/preset-typescript TS/src/app/layout.tsx"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "bin": {
+    "super-detype": "./app.js"
+  },
+  "keywords": [
+    "converter",
+    "typescript",
+    "typescript-to-javascript",
+    "compiler"
+  ],
   "author": {
     "name": "Super Kenil",
     "url": "https://superkenil.com"
   },
-  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Super-Kenil/super-detype.git"
+  },
+  "license": "MIT",
   "devDependencies": {
     "@types/babel__core": "^7.20.5",
     "@types/fs-extra": "^11.0.4",

@@ -1,10 +1,12 @@
+#!/usr/bin/env node
+
 import fs from 'fs-extra'
 import { transformSync } from '@babel/core'
 import * as path from 'path'
 const inputPath = process.argv[2]
 const outputPath = process.argv[3]
 
-async function processFiles (directory: string) {
+async function processFiles(directory) {
   try {
     const files = await fs.readdir(directory)
 
@@ -39,10 +41,9 @@ async function processFiles (directory: string) {
     }
   }
 }
-
-(async function copy () {
+console.log('compiler started');
+(async function copy() {
   try {
-    // TODO Make the destination directory dynamic
     fs.copySync(inputPath, outputPath, {
       filter: (src) => {
         return !src.includes('node_modules')
