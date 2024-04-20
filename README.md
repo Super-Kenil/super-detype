@@ -42,3 +42,19 @@ Does not support (yet):
 
 No Plans for supporting: 
 * Angular
+
+### How to Use
+* In your terminal
+
+```
+super-detype <typescript-project-directory> <output-directory>
+```
+
+* First arguement is your typescript project's directory
+* Second output should be the destination where you want to save your converted project
+
+
+> [!WARNING]
+> **This Package is not related to** : [detype](https://www.npmjs.com/package/detype). 
+> **super-detype** is built from scratch
+
