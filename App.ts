@@ -1,8 +1,6 @@
 import fs from 'fs-extra'
-// import { execSync } from 'child_process'
 import { transformSync } from '@babel/core'
 import * as path from 'path'
-// process.argv[2]
 const inputPath = process.argv[2]
 const outputPath = process.argv[3]
 
@@ -22,9 +20,6 @@ async function processFiles (directory: string) {
           presets: ['@babel/preset-typescript'],
           filename: filePath
         })
-        // C:\Coding projects\Super-Kenil\ts-compiler\App.ts
-        // const typesRemovedContent = await removeTypes(fileContent, false)
-        // console.log('file', file)
         console.log('filepath', filePath)
         let replacedPath = filePath
         if (file.endsWith('.tsx')) {
@@ -34,8 +29,6 @@ async function processFiles (directory: string) {
         }
         await fs.writeFile(replacedPath, typesRemovedContent?.code ?? 'ERROR: CONVERTING FILE', { encoding: 'utf-8', })
         await fs.rm(filePath, { force: true })
-        // console.log(`Content of ${file}:`)
-        // console.log(fileContent)
 
       }
     }
@@ -58,10 +51,6 @@ async function processFiles (directory: string) {
 
     await processFiles(outputPath)
 
-    // renames .ts and .tsx files to .js and .jsx after removing types
-    // execSync(`find '${directoryPath}/JS' -type f -name "*.tsx" -exec sh -c \'mv "$1" "\${1%.tsx}.jsx"\' _ {} \\;`)
-    // execSync(`find '${directoryPath}/JS' -type f -name "*.ts" -exec sh -c \'mv "$1" "\${1%.ts}.js"\' _ {} \\;`)
-
   } catch (error) {
     if (error instanceof Error) {
       console.error('Error:', error.message)
@@ -69,10 +58,3 @@ async function processFiles (directory: string) {
   }
 
 })()
-
-
-// err => {
-//   if (err) return console.error(err)
-//   console.log('success!')
-// }
-
