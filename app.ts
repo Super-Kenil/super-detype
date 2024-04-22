@@ -6,7 +6,7 @@ import * as path from 'path'
 const inputPath = process.argv[2]
 const outputPath = process.argv[3]
 
-async function processFiles(directory) {
+async function processFiles (directory: string) {
   try {
     const files = await fs.readdir(directory)
 
@@ -42,7 +42,7 @@ async function processFiles(directory) {
   }
 }
 console.log('compiler started');
-(async function copy() {
+(async function copy () {
   try {
     fs.copySync(inputPath, outputPath, {
       filter: (src) => {

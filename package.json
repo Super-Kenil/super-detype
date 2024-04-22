@@ -1,14 +1,15 @@
 {
   "name": "super-detype",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "This package converts your Typescript project to Javascript",
   "type": "module",
   "main": "./app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup --config"
   },
   "bin": {
-    "super-detype": "./app.js"
+    "super-detype": "./build/bundle.min.js"
   },
   "keywords": [
     "converter",
@@ -34,7 +35,12 @@
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@types/babel__core": "^7.20.5",
     "@types/fs-extra": "^11.0.4",
+    "rollup": "^4.16.1",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "tslib": "^2.6.2",
     "typescript": "^5.4.5"
   },
   "babel": {
