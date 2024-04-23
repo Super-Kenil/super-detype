@@ -1,6 +1,7 @@
 import nodePolyfills from 'rollup-plugin-polyfill-node';
 import typescript from '@rollup/plugin-typescript';
 import babel from '@rollup/plugin-babel';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
 
 /** @type {import('rollup').RollupOptions} */
 export default {
@@ -14,8 +15,7 @@ export default {
   plugins: [
     nodePolyfills(),
     typescript(),
-    babel({
-      
-    })
+    babel(),
+    nodeResolve(),
   ]
 }
