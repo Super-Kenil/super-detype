@@ -6,6 +6,8 @@ import * as path from 'path'
 const inputPath = process.argv[2]
 const outputPath = process.argv[3]
 
+process.title = 'super-detype';
+
 async function processFiles (directory: string) {
   try {
     const files = await fs.readdir(directory)

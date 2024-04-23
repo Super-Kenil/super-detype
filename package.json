@@ -1,15 +1,15 @@
 {
   "name": "super-detype",
-  "version": "0.1.11",
+  "version": "0.1.16",
   "description": "This package converts your Typescript project to Javascript",
   "type": "module",
-  "main": "./app.js",
+  "main": "./build/bundle.min.cjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup --config"
   },
   "bin": {
-    "super-detype": "./build/bundle.min.js"
+    "super-detype": "./build/bundle.min.cjs"
   },
   "keywords": [
     "converter",
@@ -17,6 +17,10 @@
     "typescript-to-javascript",
     "compiler"
   ],
+  "engines": {
+    "node": ">=12.16"
+  },
+  "preferGlobal": true,
   "author": {
     "name": "Super Kenil",
     "url": "https://superkenil.com"
@@ -35,6 +39,8 @@
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
+    "@rollup/plugin-babel": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-typescript": "^11.1.6",
     "@types/babel__core": "^7.20.5",
     "@types/fs-extra": "^11.0.4",

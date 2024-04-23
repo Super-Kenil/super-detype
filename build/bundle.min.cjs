@@ -142,6 +142,7 @@ var substr = 'ab'.substr(-1) === 'b' ?
 
 const inputPath = process.argv[2];
 const outputPath = process.argv[3];
+process.title = 'super-detype';
 function processFiles(directory) {
     return __awaiter(this, void 0, void 0, function* () {
         var _a;
