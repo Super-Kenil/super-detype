@@ -11,11 +11,14 @@ export default {
     format: 'cjs',
     name: 'bundle'
   },
-  external: ['fs-extra', '@babel/core','@babel/preset-typescript'],
+  external: ['fs-extra', '@babel/core', '@babel/preset-typescript'],
   plugins: [
     nodePolyfills(),
     typescript(),
     babel(),
-    nodeResolve(),
+    nodeResolve({
+      exclude: 'node_modules/**',
+      babelHelpers: 'runtime',
+    }),
   ]
 }
