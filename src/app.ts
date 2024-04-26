@@ -3,10 +3,14 @@
 import fs from 'fs-extra'
 import { transformSync } from '@babel/core'
 import * as path from 'path'
+
+// @ts-expect-error: No types required
+import babelTS from "@babel/preset-typescript"
+
 const inputPath = process.argv[2]
 const outputPath = process.argv[3]
 
-process.title = 'super-detype';
+process.title = 'super-detype'
 
 async function processFiles (directory: string) {
   try {
@@ -21,7 +25,7 @@ async function processFiles (directory: string) {
         const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
         const typesRemovedContent = transformSync(fileContent, {
           compact: false,
-          presets: ['@babel/preset-typescript'],
+          presets: [babelTS],
           filename: filePath
         })
         console.log('filepath', filePath)

@@ -9,24 +9,19 @@ import json from '@rollup/plugin-json';
 export default {
   input: './src/app.ts',
   output: {
-    file: './dist/bundle.cjs',
+    file: './dist/index.cjs',
     format: 'cjs',
     name: 'bundle'
   },
-  external: ['fs-extra','@babel/core'],
+  external: ['fs-extra', '@babel/core', '@babel/preset-typescript'],
   plugins: [
     nodePolyfills(),
     typescript(),
     babel({
-      babelHelpers: 'bundled',
       presets: ['@babel/preset-typescript'],
-      extensions: ['.ts', '.tsx'],
-      include: ['src/**/*'],
     }),
     commonjs(),
     json(),
-    nodeResolve({
-      extensions: ['.js', '.ts', '.tsx'],
-    }),
+    nodeResolve(),
   ],
 }

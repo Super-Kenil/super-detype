@@ -1,5 +1,3 @@
-> [!CAUTION]
-> This package is under active maintenance at the moment, avoid using it until this warning is removed.
 
 > [!NOTE]
 > This transpiler converts your **WHOLE** Typescript project to Javascript:

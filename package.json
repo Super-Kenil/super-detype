@@ -1,6 +1,6 @@
 {
   "name": "super-detype",
-  "version": "0.1.23",
+  "version": "0.1.25",
   "description": "This package converts your Typescript project to Javascript",
   "type": "module",
   "scripts": {
@@ -9,9 +9,9 @@
     "unbuild": "unbuild",
     "tsup": "tsup"
   },
-  "main": "./dist/app.cjs",
+  "main": "./dist/index.cjs",
   "bin": {
-    "super-detype": "./dist/app.cjs"
+    "super-detype": "./dist/index.cjs"
   },
   "keywords": [
     "converter",
