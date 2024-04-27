@@ -19,9 +19,10 @@ npm i -g super-detype
 > [!TIP]
 ### How to Use
 * In your terminal
+* It's Recommended to wrap the path with "quotes" to select folders with spaces
 
 ```
-super-detype <typescript-project-directory> <output-directory>
+super-detype "<typescript-project-directory>" "<output-directory>"
 ```
 <br/>
 
@@ -52,12 +53,7 @@ super-detype <typescript-project-directory> <output-directory>
 ```
 
 * First arguement is your typescript project's directory
-* Second output should be the destination where you want to save your converted project
+* Second arguement should be the destination where you want to save your converted project
 
 > [!NOTE]
-> Star this repository if it was ever helpful to you in any ways😁
-
-> [!WARNING]
-> **This Package is not related to** : [detype](https://www.npmjs.com/package/detype). 
-> **super-detype** is built from scratch
-
+> [Star](https://github.com/Super-Kenil/super-detype) this repository if it was ever helpful to you in any ways😁
