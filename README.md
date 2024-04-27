@@ -54,6 +54,8 @@ super-detype <typescript-project-directory> <output-directory>
 * First arguement is your typescript project's directory
 * Second output should be the destination where you want to save your converted project
 
+> [!NOTE]
+> Star this repository if it was ever helpful to you in any ways😁
 
 > [!WARNING]
 > **This Package is not related to** : [detype](https://www.npmjs.com/package/detype). 
