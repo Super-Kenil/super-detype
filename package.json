@@ -1,11 +1,12 @@
 {
   "name": "super-detype",
-  "version": "0.1.27",
+  "version": "0.1.28",
   "description": "This package converts your Typescript project to Javascript",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup --config"
+    "build": "rollup --config",
+    "release":"npm run build && npm publish"
   },
   "main": "./dist/index.cjs",
   "bin": {
