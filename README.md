@@ -1,4 +1,5 @@
-
+> ⭐️ Thanks **everyone** who has starred the project, it means a lot!
+<br/>
 > [!NOTE]
 > This transpiler converts your **WHOLE** Typescript project to Javascript:
 <br/>
