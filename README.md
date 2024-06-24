@@ -1,5 +1,6 @@
 > ⭐️ Thanks **everyone** who has starred the project, it means a lot!
 <br/>
+
 > [!NOTE]
 > This transpiler converts your **WHOLE** Typescript project to Javascript:
 <br/>
@@ -14,6 +15,10 @@
 * In your terminal
 ```
 npm i -g super-detype
+```
+* If you do not wish to install it, then just
+```
+npx super-detype "<typescript-project-directory>" "<output-directory>"
 ```
 <br/>
 
