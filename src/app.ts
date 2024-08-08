@@ -4,9 +4,6 @@ import fs from 'fs-extra'
 import { transformSync } from '@babel/core'
 import * as path from 'node:path'
 import chalkFile from 'chalk'
-// import { Chalk } from 'chalk'
-// // @ts-ignore
-// const chalk = new Chalk({ level: 1 })
 
 const chalk = new chalkFile.Instance({ level: 1 })
 
@@ -21,6 +18,21 @@ process.title = 'super-detype'
 const filesThatFailedConversion: string[] = []
 let totalFilesCount = 0
 let filesConvertedCount = 0
+let startTime: Date
+let endTime: Date
+
+const processedStarted = () => {
+  startTime = new Date()
+}
+
+const processFinished = () => {
+  endTime = new Date()
+  const milliseconds = endTime.getTime() - startTime.getTime()
+  const seconds = milliseconds / 1000
+
+  const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
+  console.log(chalk.magenta('Project converted in'), chalk.whiteBright(timePrint))
+}
 
 async function processFiles (directory: string) {
   try {
@@ -54,19 +66,20 @@ async function processFiles (directory: string) {
       }
     }
 
-  } 
+  }
   catch (error) {
     if (error instanceof Error) {
       console.error(chalk.bold.bgRed('Error:'), chalk.bgWhite(error.message))
     }
   }
-};
+}
 
 console.log(chalk.bold.bgMagenta('Conversion Started'));
 
 // console.log('compiler started');
 (async function copy () {
   try {
+    processedStarted()
     fs.copySync(inputPath, outputPath, {
       filter: (src) => {
         return !src.includes('node_modules')
@@ -76,9 +89,9 @@ console.log(chalk.bold.bgMagenta('Conversion Started'));
     await processFiles(outputPath)
 
     console.log(
-      chalk.cyan('Converted:'),
+      chalk.cyan('Converted'),
       chalk.bold.whiteBright(filesConvertedCount),
-      chalk.cyan('files out of'),
+      chalk.cyan('typescript files out of'),
       chalk.bold.whiteBright(totalFilesCount)
     )
 
@@ -90,7 +103,7 @@ console.log(chalk.bold.bgMagenta('Conversion Started'));
         console.log(chalk.yellow(path))
       })
     }
-
+    processFinished()
   } catch (error) {
     if (error instanceof Error) {
       console.error(chalk.bold.bgRed('Error:'), chalk.bgWhite(error.message))
@@ -102,20 +115,3 @@ const saveFailedFile = (path: string): string => {
   filesThatFailedConversion.push(path)
   return `ERROR: CONVERTING ${path}`
 }
-
-// var startTime, endTime;
-
-// function start() {
-//   startTime = new Date();
-// };
-
-// function end() {
-//   endTime = new Date();
-//   var timeDiff = endTime - startTime; //in ms
-//   // strip the ms
-//   timeDiff /= 1000;
-
-//   // get seconds
-//   var seconds = Math.round(timeDiff);
-//   console.log(seconds + " seconds");
-// }
