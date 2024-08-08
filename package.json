@@ -1,13 +1,17 @@
 {
   "name": "super-detype",
-  "version": "0.1.29",
-  "description": "This package converts your Typescript project to Javascript",
+  "version": "1.0.0-experimental.1",
+  "description": "This package converts your WHOLE Typescript project to Javascript",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rollup --config",
     "release": "npm run build && npm publish"
   },
+  "displayName": "super-detype",
+  "maintainers": [
+    "Super-Kenil"
+  ],
   "main": "./dist/index.cjs",
   "bin": {
     "super-detype": "./dist/index.cjs"
@@ -35,10 +39,11 @@
   "dependencies": {
     "@babel/core": "^7.24.4",
     "@babel/preset-typescript": "^7.24.1",
-    "@types/babel__core": "^7.20.5",
+    "chalk": "^5.3.0",
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
+    "@types/babel__core": "^7.20.5",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^25.0.7",
     "@rollup/plugin-json": "^6.1.0",
