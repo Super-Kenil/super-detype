@@ -26,7 +26,7 @@ const helpFlagsList = ['-h', '--help', '-H']
 const HELP_USAGE = `
 ${chalk.cyan('HELP:')}
 
-  ${chalk.underline('Free Meme:')} https://raw.githubusercontent.com/Super-Kenil/super-detype/431dfc9fa9a6fbeb15c6e2e38784f4d45d7f333a/images/get-help-meme.jpg
+  ${chalk.underline('Free Meme:')} https://raw.githubusercontent.com/Super-Kenil/super-detype/main/images/get-help-meme.jpg
 
   ${chalk.magenta('KEYS:')} 
     ${chalk.blue('INPUT:')}   Typescript project directory's path which you want converted to Javascript (required)
