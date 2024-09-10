@@ -72,8 +72,6 @@ function showHelp () {
   console.log(HELP_USAGE)
 }
 
-(async function CLIProcess () {
-
   const filesThatFailedConversion: string[] = []
   let totalFilesCount = 0
   let filesConvertedCount = 0
@@ -91,6 +89,8 @@ function showHelp () {
     }
   }
 
+  const [inputPath, outputPath] = params
+
   const processedStarted = () => {
     startTime = new Date()
   }
@@ -104,41 +104,15 @@ function showHelp () {
     Console.status('Project converted in', timePrint)
   }
 
-  if (!!params.length) {
-    if (!!flags.length) {
-      showHelp()
-      return false
-    }
-    if (flags.some((flag) => versionFlagsList.includes(flag))) {
-      Console.info('VERSION: ', packageJson.version)
-      return true
-    }
-    if (flags.some((flag) => helpFlagsList.includes(flag))) {
-      showHelp()
-      return params.length !== 2
-    }
-  }
-  else if (params.length !== 2) {
-    Console.error('Please provide only 2 arguments')
-    showHelp()
-    return false
-  }
-  else {
-    copyDir()
-  }
-
-  const [inputPath, outputPath] = params
-
-  const saveFailedFile = (path: string): string => {
+  const saveFailedFile = (path: string, content: string): string => {
     filesThatFailedConversion.push(path)
-    return `ERROR: CONVERTING ${path}`
+    return content
   }
 
   const processFiles = async (directory: string) => {
     try {
       const files = await fs.readdir(directory)
 
-      // console.log(chalk.bold.bgCyan('Total Files:', chalk.bgWhite(totalFilesCount.toString())))
       for (const file of files) {
         const filePath = path.join(directory, file)
 
@@ -159,9 +133,8 @@ function showHelp () {
           } else {
             replacedPath = filePath.substring(0, filePath.lastIndexOf('.ts')) + '.js'
           }
-          await fs.writeFile(replacedPath, typesRemovedContent?.code ?? saveFailedFile(filePath), { encoding: 'utf-8', })
+          await fs.writeFile(replacedPath, typesRemovedContent?.code ?? saveFailedFile(filePath, fileContent), { encoding: 'utf-8', })
           await fs.rm(filePath, { force: true })
-          // console.log(chalk.bold.bgBlue('Files converted:'), chalk.bgWhite(`${filesConverted + 1}`))
           filesConvertedCount++
         }
       }
@@ -177,7 +150,7 @@ function showHelp () {
   async function copyDir () {
     try {
       processedStarted()
-      Console.status('Conversion Started')
+      Console.status('Conversion Started', '')
       fs.copySync(inputPath, outputPath, {
         filter: (src) => {
           return !src.includes('node_modules')
@@ -189,7 +162,7 @@ function showHelp () {
       console.log(
         chalk.cyan('Converted'),
         chalk.bold.whiteBright(filesConvertedCount),
-        chalk.cyan('typescript files out of'),
+        chalk.cyan('Typescript files out of'),
         chalk.bold.whiteBright(totalFilesCount)
       )
 
@@ -210,9 +183,25 @@ function showHelp () {
     }
   }
 
-})()
-  .then((success) => process.exit(success ? 0 : 1))
-  .catch((error) => {
-    Console.error(error)
+  if (!!!params.length) {
+    if (!!!flags.length) {
+      showHelp()
+      process.exit(1)
+    }
+    if (flags.some((flag) => versionFlagsList.includes(flag))) {
+      Console.info('VERSION:', packageJson.version + ' ')
+      process.exit(0)
+    }
+    if (flags.some((flag) => helpFlagsList.includes(flag))) {
+      showHelp()
+      process.exit((params.length!==2) ? 1 : 0)
+    }
+  }
+  else if (params.length !== 2) {
+    Console.error('Please provide only 2 arguments')
+    showHelp()
     process.exit(1)
-  })
+  }
+  else {
+    copyDir()
+  }
