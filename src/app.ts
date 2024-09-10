@@ -25,23 +25,25 @@ const helpFlagsList = ['-h', '--help', '-H']
 
 // TODO, use chalk for below usage info
 const HELP_USAGE = `
-HELP: 
-  
-  USAGE: 
-    After installing as global dependency: super-detype <INPUT> <OUTPUT>
+${chalk.cyan('HELP:')}
 
-    Without installing: npx super-detype <INPUT> <OUTPUT>
+  ${chalk.underline('Free Meme:')} https://raw.githubusercontent.com/Super-Kenil/super-detype/431dfc9fa9a6fbeb15c6e2e38784f4d45d7f333a/images/get-help-meme.jpg
 
-  KEYS: 
-    INPUT:   Typescript project directory's path which you want converted to Javascript (required)
-    OUTPUT:  Path where you would like store your converted project, directory will be created if doesn't exists (required)
+  ${chalk.magenta('KEYS:')} 
+    ${chalk.blue('INPUT:')}   Typescript project directory's path which you want converted to Javascript (required)
+    ${chalk.blue('OUTPUT:')}  Path where you would like store your converted project, directory will be created if doesn't exists (required)
 
-  FLAGS:
-    super-detype [${versionFlagsList.join(' | ')}]
-      (Shows current installed version of super-detype)
+  ${chalk.magenta('USAGE:')} 
+    ${chalk.bold('After installing as global dependency:')} ${chalk.italic('super-detype <INPUT> <OUTPUT>')}
 
-    super-detype [${helpFlagsList.join(' | ')}]
-      (Shows Usage information on super-detype)
+    ${chalk.bold('Without installing:')} ${chalk.italic("npx super-detype <INPUT> <OUTPUT>")}
+
+  ${chalk.magenta('FLAGS:')}
+    ${chalk.bold(`super-detype [${versionFlagsList.join(' | ')}]`)}
+      ${chalk.dim('(Shows current installed version of super-detype)')}
+
+    ${chalk.bold(`super-detype [${helpFlagsList.join(' | ')}]`)}
+      ${chalk.dim('(Shows Usage information on super-detype)')}
 `
 
 const Console: ChalkLogType = {
@@ -89,6 +91,19 @@ function showHelp () {
     }
   }
 
+  const processedStarted = () => {
+    startTime = new Date()
+  }
+
+  const processFinished = () => {
+    endTime = new Date()
+    const milliseconds = endTime.getTime() - startTime.getTime()
+    const seconds = milliseconds / 1000
+
+    const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
+    Console.status('Project converted in', timePrint)
+  }
+
   if (!!params.length) {
     if (!!flags.length) {
       showHelp()
@@ -102,7 +117,8 @@ function showHelp () {
       showHelp()
       return params.length !== 2
     }
-  } else if (params.length !== 2) {
+  }
+  else if (params.length !== 2) {
     Console.error('Please provide only 2 arguments')
     showHelp()
     return false
@@ -112,19 +128,6 @@ function showHelp () {
   }
 
   const [inputPath, outputPath] = params
-
-  const processedStarted = () => {
-    startTime = new Date()
-  }
-
-  const processFinished = () => {
-    endTime = new Date()
-    const milliseconds = endTime.getTime() - startTime.getTime()
-    const seconds = milliseconds / 1000
-
-    const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
-    Console.status('Project converted in', timePrint)
-  }
 
   const saveFailedFile = (path: string): string => {
     filesThatFailedConversion.push(path)
