@@ -23,7 +23,6 @@ process.title = 'super-detype'
 const versionFlagsList = ['-v', '--version', '-V']
 const helpFlagsList = ['-h', '--help', '-H']
 
-// TODO, use chalk for below usage info
 const HELP_USAGE = `
 ${chalk.cyan('HELP:')}
 
@@ -72,136 +71,136 @@ function showHelp () {
   console.log(HELP_USAGE)
 }
 
-  const filesThatFailedConversion: string[] = []
-  let totalFilesCount = 0
-  let filesConvertedCount = 0
-  let startTime: Date
-  let endTime: Date
+const filesThatFailedConversion: string[] = []
+let totalFilesCount = 0
+let filesConvertedCount = 0
+let startTime: Date
+let endTime: Date
 
-  const params: string[] = []
-  const flags: string[] = []
+const params: string[] = []
+const flags: string[] = []
 
-  for (const arg of process.argv.slice(2)) {
-    if (arg.startsWith("-")) {
-      flags.push(arg)
-    } else {
-      params.push(arg)
-    }
+for (const arg of process.argv.slice(2)) {
+  if (arg.startsWith("-")) {
+    flags.push(arg)
+  } else {
+    params.push(arg)
   }
+}
 
-  const [inputPath, outputPath] = params
+const [inputPath, outputPath] = params
 
-  const processedStarted = () => {
-    startTime = new Date()
-  }
+const processedStarted = () => {
+  startTime = new Date()
+}
 
-  const processFinished = () => {
-    endTime = new Date()
-    const milliseconds = endTime.getTime() - startTime.getTime()
-    const seconds = milliseconds / 1000
+const processFinished = () => {
+  endTime = new Date()
+  const milliseconds = endTime.getTime() - startTime.getTime()
+  const seconds = milliseconds / 1000
 
-    const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
-    Console.status('Project converted in', timePrint)
-  }
+  const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
+  Console.status('Project converted in', timePrint)
+}
 
-  const saveFailedFile = (path: string, content: string): string => {
-    filesThatFailedConversion.push(path)
-    return content
-  }
+const saveFailedFile = (path: string, content: string): string => {
+  filesThatFailedConversion.push(path)
+  return content
+}
 
-  const processFiles = async (directory: string) => {
-    try {
-      const files = await fs.readdir(directory)
+const processFiles = async (directory: string) => {
+  try {
+    const files = await fs.readdir(directory)
 
-      for (const file of files) {
-        const filePath = path.join(directory, file)
+    for (const file of files) {
+      const filePath = path.join(directory, file)
 
-        if (fs.statSync(filePath).isDirectory()) {
-          await processFiles(filePath)
-        } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
-          totalFilesCount++
-          const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
-          const typesRemovedContent = transformSync(fileContent, {
-            compact: false,
-            presets: [babelTS],
-            filename: filePath
-          })
-          // console.log('filepath', filePath)
-          let replacedPath = filePath
-          if (file.endsWith('.tsx')) {
-            replacedPath = filePath.substring(0, filePath.lastIndexOf('.tsx')) + '.jsx'
-          } else {
-            replacedPath = filePath.substring(0, filePath.lastIndexOf('.ts')) + '.js'
-          }
-          await fs.writeFile(replacedPath, typesRemovedContent?.code ?? saveFailedFile(filePath, fileContent), { encoding: 'utf-8', })
-          await fs.rm(filePath, { force: true })
-          filesConvertedCount++
-        }
-      }
-
-    }
-    catch (error) {
-      if (error instanceof Error) {
-        console.error(chalk.bold.bgRed('Error:'), chalk.bgWhite(error.message))
-      }
-    }
-  }
-
-  async function copyDir () {
-    try {
-      processedStarted()
-      Console.status('Conversion Started', '')
-      fs.copySync(inputPath, outputPath, {
-        filter: (src) => {
-          return !src.includes('node_modules')
-        }
-      })
-
-      await processFiles(outputPath)
-
-      console.log(
-        chalk.cyan('Converted'),
-        chalk.bold.whiteBright(filesConvertedCount),
-        chalk.cyan('Typescript files out of'),
-        chalk.bold.whiteBright(totalFilesCount)
-      )
-
-      Console.success('Project converted successfully')
-
-      if (!!filesThatFailedConversion.length) {
-        Console.error('Files which were not converted successfully: ')
-        filesThatFailedConversion.map((path) => {
-          Console.warning(path)
+      if (fs.statSync(filePath).isDirectory()) {
+        await processFiles(filePath)
+      } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
+        totalFilesCount++
+        const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
+        const typesRemovedContent = transformSync(fileContent, {
+          compact: false,
+          presets: [babelTS],
+          filename: filePath
         })
-      }
-      processFinished()
-      return true
-    } catch (error) {
-      if (error instanceof Error) {
-        Console.error(error.message)
+        // console.log('filepath', filePath)
+        let replacedPath = filePath
+        if (file.endsWith('.tsx')) {
+          replacedPath = filePath.substring(0, filePath.lastIndexOf('.tsx')) + '.jsx'
+        } else {
+          replacedPath = filePath.substring(0, filePath.lastIndexOf('.ts')) + '.js'
+        }
+        await fs.writeFile(replacedPath, typesRemovedContent?.code ?? saveFailedFile(filePath, fileContent), { encoding: 'utf-8', })
+        await fs.rm(filePath, { force: true })
+        filesConvertedCount++
       }
     }
-  }
 
-  if (!!!params.length) {
-    if (!!!flags.length) {
-      showHelp()
-      process.exit(1)
-    }
-    if (flags.some((flag) => versionFlagsList.includes(flag))) {
-      Console.info('VERSION:', packageJson.version + ' ')
-      process.exit(0)
-    }
-    if (flags.some((flag) => helpFlagsList.includes(flag))) {
-      showHelp()
-      process.exit((params.length!==2) ? 1 : 0)
+  }
+  catch (error) {
+    if (error instanceof Error) {
+      console.error(chalk.bold.bgRed('Error:'), chalk.bgWhite(error.message))
     }
   }
-  else if (params.length !== 2) {
-    Console.error('Please provide only 2 arguments')
+}
+
+async function copyDir () {
+  try {
+    processedStarted()
+    Console.status('Conversion Started', '')
+    fs.copySync(inputPath, outputPath, {
+      filter: (src) => {
+        return !src.includes('node_modules')
+      }
+    })
+
+    await processFiles(outputPath)
+
+    console.log(
+      chalk.cyan('Converted'),
+      chalk.bold.whiteBright(filesConvertedCount),
+      chalk.cyan('Typescript files out of'),
+      chalk.bold.whiteBright(totalFilesCount)
+    )
+
+    Console.success('Project converted successfully')
+
+    if (!!filesThatFailedConversion.length) {
+      Console.error('Files which were not converted successfully: ')
+      filesThatFailedConversion.map((path) => {
+        Console.warning(path)
+      })
+    }
+    processFinished()
+    return true
+  } catch (error) {
+    if (error instanceof Error) {
+      Console.error(error.message)
+    }
+  }
+}
+
+if (!!!params.length) {
+  if (!!!flags.length) {
     showHelp()
     process.exit(1)
   }
-  else {
-    copyDir()
+  if (flags.some((flag) => versionFlagsList.includes(flag))) {
+    Console.info('VERSION:', packageJson.version + ' ')
+    process.exit(0)
   }
+  if (flags.some((flag) => helpFlagsList.includes(flag))) {
+    showHelp()
+    process.exit((params.length !== 2) ? 1 : 0)
+  }
+}
+else if (params.length !== 2) {
+  Console.error('Please provide only 2 arguments')
+  showHelp()
+  process.exit(1)
+}
+else {
+  copyDir()
+}
