@@ -28,16 +28,13 @@ npx super-detype "<typescript-project-directory>" "<output-directory>"
 ### How to Use
 * In your terminal
 * It's Recommended to wrap the path with "quotes" to select folders with spaces
+* **First arguement:** should be the path of your typescript project's directory which you want to convert
+* **Second arguement:** should be the path of destination where you want to save your converted project
 
 ```
 super-detype "<typescript-project-directory>" "<output-directory>"
 ```
 <br/>
-
-> [!TIP]
-* First arguement: should be the path of your typescript project's directory which you want to convert
-* Second arguement: should be the path of destination where you want to save your converted project
-
 
 Supports: 
 1. React (Tested)
