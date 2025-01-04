@@ -43,23 +43,12 @@ Supports:
 3. Nodejs (Tested)
 4. Vite + HTML (Tested)
 5. Gatsby (!Tested)
+6. Angular (!Tested)
 
 Does not support (yet):
 * Vue
 * Svelte
 
-No Plans for supporting: 
-* Angular
-
-### How to Use
-* In your terminal
-
-```
-super-detype <typescript-project-directory> <output-directory>
-```
-
-* First arguement is your typescript project's directory
-* Second arguement should be the destination where you want to save your converted project
 
 > [!NOTE]
 > [Star](https://github.com/Super-Kenil/super-detype) this repository if it was ever helpful to you in any ways😁
