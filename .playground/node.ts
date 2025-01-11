@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-
+"use client"
 import { copySync, readdir, readFileSync, rm, statSync, writeFile } from 'fs-extra'
-import { type Overrides } from "recast/parsers/_babel_options"
+import getBabelOptions, { type Overrides } from "recast/parsers/_babel_options"
 import { transformFromAstSync, type TransformOptions } from '@babel/core'
 import { join } from 'node:path'
 import { Instance } from 'chalk'
@@ -9,10 +9,9 @@ import { parse, print } from "recast"
 // @ts-expect-error: No types required
 import presetTS from "@babel/preset-typescript"
 // @ts-expect-error: No types required
-import transformTypescript from "@babel/plugin-transform-typescript"
+import transformTypescript from "@babel/plugin-transform-typescript";
 import { parser } from "recast/parsers/babel"
 import packageJson from "../package.json"
-import { getBabelOptions } from './babel'
 
 const chalk = new Instance({ level: 1 })
 
@@ -138,7 +137,7 @@ const processFiles = async (directory: string) => {
           parser: {
             parse: (source: string, options: Overrides) => {
               const babelOptions = getBabelOptions(options)
-              babelOptions.plugins.push('typescript', 'jsx')
+              babelOptions.plugins.push('typescript', 'jsx',)
               return parser.parse(source, babelOptions)
             }
           }
@@ -189,16 +188,16 @@ async function copyDir () {
     })
 
 
-    processFiles(outputPath).then(() => {
+    processFiles(outputPath).then(()=>{
       console.log(
         chalk.cyan('Converted'),
         chalk.bold.whiteBright(filesConvertedCount),
         chalk.cyan('Typescript files out of'),
         chalk.bold.whiteBright(totalFilesCount)
       )
-
+  
       Console.success('Project converted successfully')
-    }).catch(() => {
+    }).catch(()=>{
 
     })
 

@@ -1,28 +1,17 @@
 #!/usr/bin/env node
-
+"use client";
 import { copySync, readdir, readFileSync, rm, statSync, writeFile } from 'fs-extra'
-import { type Overrides } from "recast/parsers/_babel_options"
-import { transformFromAstSync, type TransformOptions } from '@babel/core'
+import getBabelOptions from "recast/parsers/_babel_options";
+import { transformFromAstSync } from '@babel/core';
 import { join } from 'node:path'
 import { Instance } from 'chalk'
 import { parse, print } from "recast"
 // @ts-expect-error: No types required
-import presetTS from "@babel/preset-typescript"
-// @ts-expect-error: No types required
-import transformTypescript from "@babel/plugin-transform-typescript"
+import transformTypescript from "@babel/plugin-transform-typescript";
 import { parser } from "recast/parsers/babel"
 import packageJson from "../package.json"
-import { getBabelOptions } from './babel'
 
 const chalk = new Instance({ level: 1 })
-
-type ChalkLogType = {
-  error: (...args: string[]) => void,
-  warning: (...args: string[]) => void,
-  success: (...args: string[]) => void,
-  status: (...args: string[]) => void,
-  info: (...args: string[]) => void,
-}
 
 process.title = 'super-detype'
 
@@ -51,40 +40,48 @@ ${chalk.cyan('HELP:')}
       ${chalk.dim('(Shows Usage information on super-detype)')}
 `
 
-const Console: ChalkLogType = {
-  error: (...args: string[]) => {
+const Console = {
+  error: (...args) => {
     console.error(chalk.bold.bgRed('Error: '), chalk.bgWhite(args[0]), restArgs(args, 1))
   },
-  success: (...args: string[]) => {
-    console.log(chalk.bold.bgGreenBright('Success: '), chalk.bgWhite(args[0]), restArgs(args, 1))
+  success: (...args) => {
+    console.log(
+      chalk.bold.bgGreenBright('Success: '),
+      chalk.bgWhite(args[0]),
+      restArgs(args, 1)
+    )
   },
-  info: (...args: string[]) => {
+  info: (...args) => {
     console.info(chalk.bold.bgCyan(args[0]), chalk.bgWhite(args[1]), restArgs(args, 2))
   },
-  warning: (...args: string[]) => {
-    console.warn(chalk.bold.bgYellowBright(args[0]), chalk.bgWhite(args[1]), restArgs(args, 2))
+  warning: (...args) => {
+    console.warn(
+      chalk.bold.bgYellowBright(args[0]),
+      chalk.bgWhite(args[1]),
+      restArgs(args, 2)
+    )
   },
-  status: (...args: string[]) => {
+  status: (...args) => {
     console.log(chalk.bold.bgMagenta(args[0]), chalk.bgWhite(args[1]), restArgs(args, 2))
   },
 }
 
-function restArgs (args: string[], startFrom: number): string {
-  return args.slice(startFrom).join(', ')
+function restArgs(args, startFrom) {
+  return args.slice(startFrom).join(', ');
 }
 
 function showHelp () {
   console.log(HELP_USAGE)
 }
 
-const filesThatFailedConversion: string[] = []
+const filesThatFailedConversion = []
 let totalFilesCount = 0
 let filesConvertedCount = 0
-let startTime: Date
-let endTime: Date
+let startTime
+let endTime
 
-const params: string[] = []
-const flags: string[] = []
+const params = []
+const flags = []
 
 for (const arg of process.argv.slice(2)) {
   if (arg.startsWith("-")) {
@@ -105,16 +102,16 @@ const processFinished = () => {
   const milliseconds = endTime.getTime() - startTime.getTime()
   const seconds = milliseconds / 1000
 
-  const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
+  const timePrint = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
   Console.status('Project converted in', timePrint)
 }
 
-const saveFailedFile = (path: string, content: string): string => {
+const saveFailedFile = (path, content) => {
   filesThatFailedConversion.push(path)
   return content
 }
 
-const transformerOptions: TransformOptions = {
+const transformerOptions = {
   cloneInputAst: false,
   code: false,
   ast: true,
@@ -122,7 +119,7 @@ const transformerOptions: TransformOptions = {
   configFile: false
 }
 
-const processFiles = async (directory: string) => {
+const processFiles = async (directory) => {
   try {
     const files = await readdir(directory)
 
@@ -136,10 +133,10 @@ const processFiles = async (directory: string) => {
         const fileContent = readFileSync(filePath, { encoding: 'utf-8' })
         const ast = parse(fileContent, {
           parser: {
-            parse: (source: string, options: Overrides) => {
+            parse: (source, options) => {
               const babelOptions = getBabelOptions(options)
               babelOptions.plugins.push('typescript', 'jsx')
-              return parser.parse(source, babelOptions)
+              return parser.parse(source, babelOptions);
             }
           }
         })
@@ -183,22 +180,22 @@ async function copyDir () {
     processedStarted()
     Console.status('Conversion Started', '')
     copySync(inputPath, outputPath, {
-      filter: (src: string) => {
-        return !directoriesToIgnore.some((dir: string) => src.includes(dir))
+      filter: (src) => {
+        return !directoriesToIgnore.some((dir) => src.includes(dir));
       }
     })
 
 
-    processFiles(outputPath).then(() => {
+    processFiles(outputPath).then(()=>{
       console.log(
         chalk.cyan('Converted'),
         chalk.bold.whiteBright(filesConvertedCount),
         chalk.cyan('Typescript files out of'),
         chalk.bold.whiteBright(totalFilesCount)
       )
-
+  
       Console.success('Project converted successfully')
-    }).catch(() => {
+    }).catch(()=>{
 
     })
 
@@ -222,11 +219,11 @@ if (!!!params.length) {
     showHelp()
     process.exit(1)
   }
-  if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
+  if (flags.some((flag) => versionFlagsList.includes(flag))) {
     Console.info('VERSION:', packageJson.version + ' ')
     process.exit(0)
   }
-  if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
+  if (flags.some((flag) => helpFlagsList.includes(flag))) {
     showHelp()
     process.exit((params.length !== 2) ? 1 : 0)
   }

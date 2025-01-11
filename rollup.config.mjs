@@ -13,12 +13,11 @@ export default {
     name: 'bundle',
     plugins: [terser({ compress: true, sourceMap: false })]
   },
-  external: ['fs-extra', '@babel/core', '@babel/preset-typescript'],
   plugins: [
     typescript2(),
     json(),
     babel({
-      presets: ['@babel/preset-typescript'],
+      presets: ['@babel/plugin-transform-typescript'],
     }),
     commonjs(),
   ],
