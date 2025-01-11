@@ -37,6 +37,11 @@ yarn i -g super-detype
 ```
 pnpm i -g super-detype
 ```
+#### **deno**
+
+```
+deno install -g npm:super-detype
+```
 #### **bun**
 
 ```
