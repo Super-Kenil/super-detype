@@ -6,7 +6,7 @@ import * as path from 'node:path'
 import chalkFile from 'chalk'
 // @ts-expect-error: No types required
 import babelTS from "@babel/preset-typescript"
-import packageJson from "../package.json"
+import packageJson from "../package.json" with { type: "json" }
 
 const chalk = new chalkFile.Instance({ level: 1 })
 
@@ -123,7 +123,8 @@ const processFiles = async (directory: string) => {
         const typesRemovedContent = transformSync(fileContent, {
           compact: false,
           presets: [babelTS],
-          filename: filePath
+          filename: filePath,
+          generatorOpts: { importAttributesKeyword: 'with' }
         })
         // console.log('filepath', filePath)
         let replacedPath = filePath
