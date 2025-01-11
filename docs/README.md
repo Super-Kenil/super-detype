@@ -30,12 +30,12 @@ npm i -g super-detype
 #### **yarn**
 
 ```
-yarn i -g super-detype
+yarn global add super-detype
 ```
 #### **pnpm**
 
 ```
-pnpm i -g super-detype
+pnpm add -g super-detype
 ```
 #### **deno**
 
