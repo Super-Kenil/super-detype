@@ -2,6 +2,7 @@
 
 > ⭐️ Thanks **everyone** who has starred the project, it means a lot!
 <br/>
+### [Read Docs](https://super-detype.superkenil.com/)
 
 > [!NOTE]
 > This transpiler converts your **WHOLE** Typescript project to Javascript:
@@ -37,12 +38,12 @@ super-detype "<typescript-project-directory>" "<output-directory>"
 <br/>
 
 Supports: 
-1. React (Tested)
-2. Nextjs (Tested)
-3. Nodejs (Tested)
-4. Vite + HTML (Tested)
+1. Nodejs (Tested)
+2. React (Tested)
+3. Remix (Tested)
+4. Nextjs (Tested)
 5. Gatsby (!Tested)
-6. Angular (!Tested)
+6. Vite + HTML (Tested)
 
 Does not support (yet):
 * Vue
