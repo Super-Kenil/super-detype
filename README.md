@@ -1,7 +1,7 @@
 # Super-Kenil/super-detype
 
 > ⭐️ Thanks **everyone** who has starred the project, it means a lot!
-<br/>
+
 ### [Read Docs](https://super-detype.superkenil.com/)
 
 > [!NOTE]
