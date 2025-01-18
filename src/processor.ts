@@ -1,12 +1,11 @@
 #!/usr/bin/env node
 
 import fs from 'fs-extra'
-import { transformSync } from '@babel/core'
 import * as path from 'node:path'
 import chalkFile from 'chalk'
-// @ts-expect-error: No types required
-import babelTS from "@babel/preset-typescript"
 import packageJson from "../package.json" with { type: "json" }
+import { ThreadPool } from './threadPool'
+import type { WorkerData } from './types'
 
 const chalk = new chalkFile.Instance({ level: 1 })
 
@@ -107,10 +106,15 @@ const saveFailedFile = (path: string, content: string): string => {
   return content
 }
 
+// ... existing code until processFiles function ...
+
 const processFiles = async (directory: string) => {
   try {
+    const threadPool = new ThreadPool()
     const files = await fs.readdir(directory)
+    const filesToProcess: WorkerData[] = []
 
+    // Collect all files first
     for (const file of files) {
       const filePath = path.join(directory, file)
 
@@ -119,32 +123,37 @@ const processFiles = async (directory: string) => {
       } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
         totalFilesCount++
         const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
-        const typesRemovedContent = transformSync(fileContent, {
-          compact: false,
-          presets: [babelTS],
-          filename: filePath,
-          generatorOpts: { importAttributesKeyword: 'with' }
+        const outputPath = file.endsWith('.tsx')
+          ? filePath.replace('.tsx', '.jsx')
+          : filePath.replace('.ts', '.js')
+
+        filesToProcess.push({
+          filePath,
+          fileContent,
+          outputPath
         })
-        // console.log('filepath', filePath)
-        let replacedPath = filePath
-        if (file.endsWith('.tsx')) {
-          replacedPath = filePath.substring(0, filePath.lastIndexOf('.tsx')) + '.jsx'
-        } else {
-          replacedPath = filePath.substring(0, filePath.lastIndexOf('.ts')) + '.js'
-        }
-        await fs.writeFile(replacedPath, typesRemovedContent?.code ?? saveFailedFile(filePath, fileContent), { encoding: 'utf-8', })
-        await fs.rm(filePath, { force: true })
-        filesConvertedCount++
       }
     }
 
-  }
-  catch (error) {
+    // Process files in parallel
+    const results = await threadPool.processBatch(filesToProcess)
+
+    results.forEach(result => {
+      if (result.success) {
+        filesConvertedCount++
+      } else {
+        filesThatFailedConversion.push(result.filePath)
+      }
+    })
+
+    threadPool.cleanup()
+  } catch (error) {
     if (error instanceof Error) {
-      console.error(chalk.bold.bgRed('Error:'), chalk.bgWhite(error.message))
+      Console.error(error.message)
     }
   }
 }
+
 
 async function copyDir () {
   try {
@@ -204,3 +213,5 @@ else if (params.length !== 2) {
 else {
   copyDir()
 }
+
+// ... rest of existing code ...

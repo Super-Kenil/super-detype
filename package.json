@@ -13,6 +13,9 @@
   "maintainers": [
     "Super-Kenil"
   ],
+  "bugs": {
+    "url": "https://github.com/Super-Kenil/super-detype/issues"
+  },
   "main": "./dist/out.min.js",
   "bin": {
     "super-detype": "./dist/out.min.js"
