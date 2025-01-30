@@ -1,6 +1,6 @@
 {
   "name": "super-detype",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "This package converts your WHOLE Typescript project to Javascript",
   "type": "module",
   "homepage": "https://super-detype.superkenil.com",
