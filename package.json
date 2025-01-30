@@ -40,7 +40,7 @@
   "dependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-typescript": "^7.26.0",
-    "chalk": "4.1.2",
+    "chalk": "5.4.1",
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
