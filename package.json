@@ -1,6 +1,6 @@
 {
   "name": "super-detype",
-  "version": "1.1.11",
+  "version": "1.1.13",
   "description": "This package converts your WHOLE Typescript project to Javascript",
   "type": "module",
   "homepage": "https://super-detype.superkenil.com",
@@ -39,7 +39,7 @@
   "license": "MIT",
   "dependencies": {
     "@babel/core": "^7.26.7",
-    "@babel/preset-typescript": "^7.26.0",
+    "@babel/preset-typescript": "^7.27.1",
     "chalk": "4.1.2",
     "fs-extra": "^11.3.0"
   },
