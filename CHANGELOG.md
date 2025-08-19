@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v2.0.0
+| Title                                                                                              | type        |
+| -------------------------------------------------------------------------------------------------- | ----------- |
+| Feature: Added multi-threading for faster conversion (approx. 50-80% faster on multi-core systems) | feature     |
+| Feature: Added progress bar to show conversion progress                                            | feature     |
+| Improvement: Refactored I/O operations for better performance                                      | improvement |
+
 ## v1.1.13
 | Title                                                           | type |
 | --------------------------------------------------------------- | ---- |

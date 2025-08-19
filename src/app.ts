@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 
-import fs from 'fs-extra'
-import { transformSync } from '@babel/core'
-import * as path from 'node:path'
 import chalkFile from 'chalk'
-// @ts-expect-error: No types required
-import babelTS from "@babel/preset-typescript"
+import cliProgress from 'cli-progress'
+import fs from 'fs-extra'
+import * as os from 'node:os'
+import * as path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { Worker } from 'node:worker_threads'
 import packageJson from "../package.json" with { type: "json" }
 
 const chalk = new chalkFile.Instance({ level: 1 })
@@ -72,8 +73,6 @@ function showHelp () {
 }
 
 const filesThatFailedConversion: string[] = []
-let totalFilesCount = 0
-let filesConvertedCount = 0
 let startTime: Date
 let endTime: Date
 
@@ -103,79 +102,106 @@ const processFinished = () => {
   Console.status('Project converted in', timePrint)
 }
 
-const saveFailedFile = (path: string, content: string): string => {
-  filesThatFailedConversion.push(path)
-  return content
-}
-
-const processFiles = async (directory: string) => {
+const getAllFiles = (dirPath: string, arrayOfFiles: string[] = []) => {
   try {
-    const files = await fs.readdir(directory)
+    const files = fs.readdirSync(dirPath)
 
     for (const file of files) {
-      const filePath = path.join(directory, file)
-
-      if (fs.statSync(filePath).isDirectory()) {
-        await processFiles(filePath)
-      } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
-        totalFilesCount++
-        const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
-        const typesRemovedContent = transformSync(fileContent, {
-          compact: false,
-          presets: [babelTS],
-          filename: filePath,
-          generatorOpts: { importAttributesKeyword: 'with' }
-        })
-        // console.log('filepath', filePath)
-        let replacedPath = filePath
-        if (file.endsWith('.tsx')) {
-          replacedPath = filePath.substring(0, filePath.lastIndexOf('.tsx')) + '.jsx'
-        } else {
-          replacedPath = filePath.substring(0, filePath.lastIndexOf('.ts')) + '.js'
-        }
-        await fs.writeFile(replacedPath, typesRemovedContent?.code ?? saveFailedFile(filePath, fileContent), { encoding: 'utf-8', })
-        await fs.rm(filePath, { force: true })
-        filesConvertedCount++
+      const fullPath = path.join(dirPath, file)
+      if (fs.statSync(fullPath).isDirectory()) {
+        arrayOfFiles = getAllFiles(fullPath, arrayOfFiles)
+      } else {
+        arrayOfFiles.push(fullPath)
       }
     }
+  } catch (error) {
+    console.error(error)
+  }
 
-  }
-  catch (error) {
-    if (error instanceof Error) {
-      console.error(chalk.bold.bgRed('Error:'), chalk.bgWhite(error.message))
-    }
-  }
+  return arrayOfFiles
 }
 
-async function copyDir () {
+async function runConversion (inputPath: string, outputPath: string) {
   try {
     processedStarted()
     Console.status('Conversion Started', '')
-    fs.copySync(inputPath, outputPath, {
-      filter: (src) => {
-        return !src.includes('node_modules')
-      }
-    })
 
-    await processFiles(outputPath)
+    const allFiles = getAllFiles(inputPath).filter((file: string) => !file.includes('node_modules'))
+
+    const tsFiles = allFiles.filter((file: string) => file.endsWith('.ts') || file.endsWith('.tsx'))
+    const otherFiles = allFiles.filter((file: string) => !file.endsWith('.ts') && !file.endsWith('.tsx'))
+
+    let filesConvertedCount = 0
+
+    const progressBar = new cliProgress.SingleBar({
+      format: ' {bar} | {percentage}% | {value}/{total} Files | ETA: {eta}s'
+    }, cliProgress.Presets.shades_classic)
+    progressBar.start(allFiles.length, 0)
+
+    await Promise.all(otherFiles.map(async (file: string) => {
+      const relativePath = path.relative(inputPath, file)
+      const destinationPath = path.join(outputPath, relativePath)
+      await fs.copy(file, destinationPath)
+      progressBar.increment()
+    }))
+
+    const numCPUs = os.cpus().length > 1 ? os.cpus().length - 1 : 1
+    const workerPromises: Promise<void>[] = []
+
+    const workerPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'worker.js')
+
+    const taskQueue = [...tsFiles]
+
+    for (let i = 0; i < numCPUs; i++) {
+      workerPromises.push(new Promise((resolve) => {
+        const worker = new Worker(workerPath)
+
+        const nextTask = () => {
+          if (taskQueue.length > 0) {
+            const filePath = taskQueue.shift()!
+            worker.postMessage({ filePath, inputPath, outputPath })
+          } else {
+            worker.terminate()
+            resolve()
+          }
+        }
+
+        worker.on('message', (result) => {
+          if (result.status === 'success') {
+            filesConvertedCount++
+          } else {
+            filesThatFailedConversion.push(result.path)
+          }
+          progressBar.increment()
+          nextTask()
+        })
+
+        worker.on('error', () => {
+          progressBar.increment()
+          nextTask()
+        })
+
+        nextTask()
+      }))
+    }
+
+    await Promise.all(workerPromises)
+
+    progressBar.stop()
 
     console.log(
-      chalk.cyan('Converted'),
-      chalk.bold.whiteBright(filesConvertedCount),
-      chalk.cyan('Typescript files out of'),
-      chalk.bold.whiteBright(totalFilesCount)
+      `\n${chalk.cyan('Converted')} ${chalk.bold.whiteBright(filesConvertedCount)} ${chalk.cyan('Typescript files out of')} ${chalk.bold.whiteBright(tsFiles.length)}`
     )
 
     Console.success('Project converted successfully')
 
     if (!!filesThatFailedConversion.length) {
       Console.error('Files which were not converted successfully: ')
-      filesThatFailedConversion.map((path) => {
+      filesThatFailedConversion.map((path: string) => {
         Console.warning(path)
       })
     }
     processFinished()
-    return true
   } catch (error) {
     if (error instanceof Error) {
       Console.error(error.message)
@@ -183,16 +209,17 @@ async function copyDir () {
   }
 }
 
+
 if (!!!params.length) {
   if (!!!flags.length) {
     showHelp()
     process.exit(1)
   }
-  if (flags.some((flag) => versionFlagsList.includes(flag))) {
+  if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
     Console.info('VERSION:', packageJson.version + ' ')
     process.exit(0)
   }
-  if (flags.some((flag) => helpFlagsList.includes(flag))) {
+  if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
     showHelp()
     process.exit((params.length !== 2) ? 1 : 0)
   }
@@ -203,5 +230,5 @@ else if (params.length !== 2) {
   process.exit(1)
 }
 else {
-  copyDir()
+  runConversion(inputPath, outputPath)
 }
