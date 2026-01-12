@@ -1,18 +1,22 @@
-import type { WorkerPool } from './worker-pool'
-import type { TaskName } from '../worker'
+import * as tasks from './transformer-tasks.js'
 
-const createWorkerTransformer = (pool: WorkerPool, taskName: TaskName) => {
+const createTransformer = (taskName: keyof typeof tasks) => {
   return async (content: string, fileName: string): Promise<string> => {
+    if (!fileName.endsWith('.ts') && !fileName.endsWith('.tsx')) {
+      return content
+    }
+
     try {
-      const result = await pool.exec({ content, filePath: fileName, taskName })
+      const fn = tasks[taskName]
+      const result = await fn(content, fileName)
       return result as string
     } catch (e) {
-      // incase if babel ts parser fails converting because of invalid syntax, I've seen it happen
-      console.warn(`Worker transformation '${taskName}' failed for ${fileName}, using original content. Error: ${(e as Error).message}`)
+      // Just in case if babel ts parser fails converting because of invalid syntax (I've seen it happen)
+      console.warn(`Transformation '${taskName}' failed for ${fileName}, using original content. Error: ${(e as Error).message}`)
       return content
     }
   }
 }
 
-export const getBabelTransformer = (pool: WorkerPool) => createWorkerTransformer(pool, 'babelTransform')
-export const getImportExtensionRemover = (pool: WorkerPool) => createWorkerTransformer(pool, 'removeImportExtensions')
+export const getBabelTransformer = () => createTransformer('babelTransform')
+export const getImportExtensionRemover = () => createTransformer('removeImportExtensions')

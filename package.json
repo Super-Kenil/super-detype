@@ -7,7 +7,7 @@
   "scripts": {
     "test": "bun run ./dist/out.min.js test/input test/output",
     "test:src": "bun run ./src/app.ts test/input test/output",
-    "build": "esbuild ./src/app.ts --outfile=./dist/out.min.js --platform=node --bundle --minify --format=esm --packages=external && esbuild ./src/worker.ts --outfile=./dist/worker.js --platform=node --bundle --minify --format=esm --packages=external",
+    "build": "esbuild ./src/app.ts --outfile=./dist/out.min.js --platform=node --bundle --minify --format=esm --packages=external",
     "release": "npm run build && npm publish"
   },
   "displayName": "super-detype",

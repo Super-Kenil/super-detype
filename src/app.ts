@@ -2,11 +2,9 @@
 
 import Chalk from 'chalk'
 import path from 'path'
-import { fileURLToPath } from 'url'
 import packageJson from "../package.json" with { type: "json" }
 import { fileTransformer, type FileTransformerOptions } from './helpers/file-transformer.js'
 import { getBabelTransformer, getImportExtensionRemover } from './helpers/transformers.js'
-import { WorkerPool } from './helpers/worker-pool.js'
 
 const chalk = new Chalk.Instance({ level: 1 })
 
@@ -86,16 +84,13 @@ const processFinished = () => {
   const seconds = milliseconds / 1000
 
   const timePrint: string = (seconds < 1) ? `[${milliseconds.toFixed(2)}ms]` : `[${seconds.toFixed(2)}s]`
-  Console.status('Project converted in', timePrint)
+  Console.status('Processed in:', timePrint)
 }
 
 async function runConversion (inputPath: string, outputPath: string, filterPattern?: string) {
   try {
     processedStarted()
     Console.status('Conversion Started', '')
-
-    const workerPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'worker.js')
-    const pool = new WorkerPool(workerPath)
 
     const options: FileTransformerOptions = {
       inputPath: path.resolve(inputPath),
@@ -120,18 +115,13 @@ async function runConversion (inputPath: string, outputPath: string, filterPatte
       }
     }
 
-    const babelTransformer = getBabelTransformer(pool)
-    const importRemover = getImportExtensionRemover(pool)
-
-    console.log('Booted up.....')
+    const babelTransformer = getBabelTransformer()
+    const importRemover = getImportExtensionRemover()
 
     await fileTransformer(options, [
       importRemover,
       babelTransformer
     ])
-
-    // finally close the worker pool
-    await pool.close()
 
     processFinished()
     Console.success('Project converted successfully')
