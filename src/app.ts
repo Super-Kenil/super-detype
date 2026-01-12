@@ -2,8 +2,9 @@
 
 import Chalk from 'chalk'
 import path from 'path'
+import { pathToFileURL } from 'url'
 import packageJson from "../package.json" with { type: "json" }
-import { fileTransformer, type FileTransformerOptions } from './helpers/file-transformer.js'
+import { fileTransformer, type FileTransformerOptions, type TransformerFunction } from './helpers/file-transformer.js'
 import { getBabelTransformer, getImportExtensionRemover } from './helpers/transformers.js'
 
 const chalk = new Chalk.Instance({ level: 1 })
@@ -15,6 +16,11 @@ type ChalkLogType = {
   status: (...args: string[]) => void,
   info: (...args: string[]) => void,
 }
+
+export type RunConversionOptions = (
+  options: FileTransformerOptions,
+  transformers?: TransformerFunction[]
+) => Promise<void>
 
 process.title = 'super-detype'
 
@@ -87,41 +93,51 @@ const processFinished = () => {
   Console.status('Processed in:', timePrint)
 }
 
-async function runConversion (inputPath: string, outputPath: string, filterPattern?: string) {
+export const runConversion: RunConversionOptions = async (
+  passedOptions,
+  passedTransformers
+) => {
+  const {
+    inputPath,
+    outputPath,
+    pattern: filterPattern,
+    pathTransform = (relativePath, isDirectory) => {
+      if (isDirectory) return relativePath
+      const ext = path.extname(relativePath)
+      if (ext === '.tsx') {
+        return relativePath.substring(0, relativePath.lastIndexOf('.tsx')) + '.jsx'
+      } else if (ext === '.ts' && !relativePath.endsWith('.d.ts')) { // so that it doesn't rename .d.ts import statements even though nothing is imported from them actually
+        return relativePath.substring(0, relativePath.lastIndexOf('.ts')) + '.js'
+      }
+      return relativePath
+    },
+    filter = (name, isDirectory) => {
+      // Filter out node_modules
+      if (name === 'node_modules') return false
+      // Filter out .d.ts files
+      if (!isDirectory && name.endsWith('.d.ts')) return false
+      return true
+    }
+  } = passedOptions
+
+  const transformers = passedTransformers ?? [
+    getImportExtensionRemover(),
+    getBabelTransformer()
+  ]
+
   try {
     processedStarted()
     Console.status('Conversion Started', '')
 
     const options: FileTransformerOptions = {
       inputPath: path.resolve(inputPath),
-      outputPath: path.resolve(outputPath),
+      outputPath: outputPath ? path.resolve(outputPath) : undefined,
       pattern: filterPattern,
-      pathTransform: (relativePath, isDirectory) => {
-        if (isDirectory) return relativePath
-        const ext = path.extname(relativePath)
-        if (ext === '.tsx') {
-          return relativePath.substring(0, relativePath.lastIndexOf('.tsx')) + '.jsx'
-        } else if (ext === '.ts' && !relativePath.endsWith('.d.ts')) { // so that it doesn't rename .d.ts import statements even though nothing is imported from them actually
-          return relativePath.substring(0, relativePath.lastIndexOf('.ts')) + '.js'
-        }
-        return relativePath
-      },
-      filter: (name, isDirectory) => {
-        // Filter out node_modules
-        if (name === 'node_modules') return false
-        // Filter out .d.ts files
-        if (!isDirectory && name.endsWith('.d.ts')) return false
-        return true
-      }
+      pathTransform,
+      filter
     }
 
-    const babelTransformer = getBabelTransformer()
-    const importRemover = getImportExtensionRemover()
-
-    await fileTransformer(options, [
-      importRemover,
-      babelTransformer
-    ])
+    await fileTransformer(options, transformers)
 
     processFinished()
     Console.success('Project converted successfully')
@@ -134,46 +150,54 @@ async function runConversion (inputPath: string, outputPath: string, filterPatte
 }
 
 // Argument parsing logic..
-const params: string[] = []
-const flags: string[] = []
-let filterPattern: string | undefined
+const isMain = process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
 
-const args = process.argv.slice(2)
-for (let i = 0; i < args.length; i++) {
-  const arg = args[i]
-  if (arg.startsWith("-")) {
-    if (arg === '-f' || arg === '--filter') {
-      filterPattern = args[i + 1]
-      i++
+if (isMain) {
+  const params: string[] = []
+  const flags: string[] = []
+  let filterPattern: string | undefined
+
+  const args = process.argv.slice(2)
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (arg.startsWith("-")) {
+      if (arg === '-f' || arg === '--filter') {
+        filterPattern = args[i + 1]
+        i++
+      } else {
+        flags.push(arg)
+      }
     } else {
-      flags.push(arg)
+      params.push(arg)
     }
-  } else {
-    params.push(arg)
   }
-}
 
-if (params.length === 0) {
-  if (flags.length === 0) {
+  if (params.length === 0) {
+    if (flags.length === 0) {
+      showHelp()
+      process.exit(1)
+    }
+    if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
+      Console.info('VERSION:', packageJson.version + ' ')
+      process.exit(0)
+    }
+    if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
+      showHelp()
+      // decides to show error or not
+      process.exit((params.length !== 2) ? 1 : 0)
+    }
+  }
+  else if (params.length !== 2) {
+    Console.error('Please provide input and output paths')
     showHelp()
     process.exit(1)
   }
-  if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
-    Console.info('VERSION:', packageJson.version + ' ')
-    process.exit(0)
+  else {
+    const [input, output] = params
+    runConversion({
+      inputPath: input,
+      outputPath: output,
+      pattern: filterPattern
+    })
   }
-  if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
-    showHelp()
-    // decides to show error or not
-    process.exit((params.length !== 2) ? 1 : 0)
-  }
-}
-else if (params.length !== 2) {
-  Console.error('Please provide input and output paths')
-  showHelp()
-  process.exit(1)
-}
-else {
-  const [input, output] = params
-  runConversion(input, output, filterPattern)
 }
