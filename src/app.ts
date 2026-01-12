@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
-import chalkFile from 'chalk'
-import cliProgress from 'cli-progress'
-import fs from 'fs-extra'
-import * as os from 'node:os'
-import * as path from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { Worker } from 'node:worker_threads'
+import Chalk from 'chalk'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import packageJson from "../package.json" with { type: "json" }
+import { fileTransformer, type FileTransformerOptions } from './helpers/file-transformer.js'
+import { getBabelTransformer, getImportExtensionRemover } from './helpers/transformers.js'
+import { WorkerPool } from './helpers/worker-pool.js'
 
-const chalk = new chalkFile.Instance({ level: 1 })
+const chalk = new Chalk.Instance({ level: 1 })
 
 type ChalkLogType = {
   error: (...args: string[]) => void,
@@ -29,16 +28,18 @@ ${chalk.cyan('HELP:')}
 
   ${chalk.underline('Free Meme:')} https://raw.githubusercontent.com/Super-Kenil/super-detype/main/images/get-help-meme.jpg
 
-  ${chalk.magenta('KEYS:')} 
+  ${chalk.magenta('KEYS:')}
     ${chalk.blue('INPUT:')}   Typescript project directory's path which you want converted to Javascript (required)
     ${chalk.blue('OUTPUT:')}  Path where you would like store your converted project, directory will be created if doesn't exists (required)
 
-  ${chalk.magenta('USAGE:')} 
-    ${chalk.bold('After installing as global dependency:')} ${chalk.italic('super-detype <INPUT> <OUTPUT>')}
+  ${chalk.magenta('USAGE:')}
+    ${chalk.bold('After installing as global dependency:')} ${chalk.italic('super-detype <INPUT> <OUTPUT> [OPTIONS]')}
 
-    ${chalk.bold('Without installing:')} ${chalk.italic("npx super-detype <INPUT> <OUTPUT>")}
+    ${chalk.bold('Without installing:')} ${chalk.italic("npx super-detype <INPUT> <OUTPUT> [OPTIONS]")}
 
   ${chalk.magenta('FLAGS:')}
+    ${chalk.bold(`-f, --filter <GLOB>`)}  Filter files using glob pattern (e.g. "**/*.ts")
+
     ${chalk.bold(`super-detype [${versionFlagsList.join(' | ')}]`)}
       ${chalk.dim('(Shows current installed version of super-detype)')}
 
@@ -72,22 +73,8 @@ function showHelp () {
   console.log(HELP_USAGE)
 }
 
-const filesThatFailedConversion: string[] = []
 let startTime: Date
 let endTime: Date
-
-const params: string[] = []
-const flags: string[] = []
-
-for (const arg of process.argv.slice(2)) {
-  if (arg.startsWith("-")) {
-    flags.push(arg)
-  } else {
-    params.push(arg)
-  }
-}
-
-const [inputPath, outputPath] = params
 
 const processedStarted = () => {
   startTime = new Date()
@@ -102,106 +89,53 @@ const processFinished = () => {
   Console.status('Project converted in', timePrint)
 }
 
-const getAllFiles = (dirPath: string, arrayOfFiles: string[] = []) => {
-  try {
-    const files = fs.readdirSync(dirPath)
-
-    for (const file of files) {
-      const fullPath = path.join(dirPath, file)
-      if (fs.statSync(fullPath).isDirectory()) {
-        arrayOfFiles = getAllFiles(fullPath, arrayOfFiles)
-      } else {
-        arrayOfFiles.push(fullPath)
-      }
-    }
-  } catch (error) {
-    console.error(error)
-  }
-
-  return arrayOfFiles
-}
-
-async function runConversion (inputPath: string, outputPath: string) {
+async function runConversion (inputPath: string, outputPath: string, filterPattern?: string) {
   try {
     processedStarted()
     Console.status('Conversion Started', '')
 
-    const allFiles = getAllFiles(inputPath).filter((file: string) => !file.includes('node_modules'))
-
-    const tsFiles = allFiles.filter((file: string) => file.endsWith('.ts') || file.endsWith('.tsx'))
-    const otherFiles = allFiles.filter((file: string) => !file.endsWith('.ts') && !file.endsWith('.tsx'))
-
-    let filesConvertedCount = 0
-
-    const progressBar = new cliProgress.SingleBar({
-      format: ' {bar} | {percentage}% | {value}/{total} Files | ETA: {eta}s'
-    }, cliProgress.Presets.shades_classic)
-    progressBar.start(allFiles.length, 0)
-
-    await Promise.all(otherFiles.map(async (file: string) => {
-      const relativePath = path.relative(inputPath, file)
-      const destinationPath = path.join(outputPath, relativePath)
-      await fs.copy(file, destinationPath)
-      progressBar.increment()
-    }))
-
-    const numCPUs = os.cpus().length > 1 ? os.cpus().length - 1 : 1
-    const workerPromises: Promise<void>[] = []
-
     const workerPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'worker.js')
+    const pool = new WorkerPool(workerPath)
 
-    const taskQueue = [...tsFiles]
-
-    for (let i = 0; i < numCPUs; i++) {
-      workerPromises.push(new Promise((resolve) => {
-        const worker = new Worker(workerPath)
-
-        const nextTask = () => {
-          if (taskQueue.length > 0) {
-            const filePath = taskQueue.shift()!
-            worker.postMessage({ filePath, inputPath, outputPath })
-          } else {
-            worker.terminate()
-            resolve()
-          }
+    const options: FileTransformerOptions = {
+      inputPath: path.resolve(inputPath),
+      outputPath: path.resolve(outputPath),
+      pattern: filterPattern,
+      pathTransform: (relativePath, isDirectory) => {
+        if (isDirectory) return relativePath
+        const ext = path.extname(relativePath)
+        if (ext === '.tsx') {
+          return relativePath.substring(0, relativePath.lastIndexOf('.tsx')) + '.jsx'
+        } else if (ext === '.ts' && !relativePath.endsWith('.d.ts')) { // so that it doesn't rename .d.ts import statements even though nothing is imported from them actually
+          return relativePath.substring(0, relativePath.lastIndexOf('.ts')) + '.js'
         }
-
-        worker.on('message', (result) => {
-          if (result.status === 'success') {
-            filesConvertedCount++
-          } else {
-            filesThatFailedConversion.push(result.path)
-          }
-          progressBar.increment()
-          nextTask()
-        })
-
-        worker.on('error', () => {
-          progressBar.increment()
-          nextTask()
-        })
-
-        nextTask()
-      }))
+        return relativePath
+      },
+      filter: (name, isDirectory) => {
+        // Filter out node_modules
+        if (name === 'node_modules') return false
+        // Filter out .d.ts files
+        if (!isDirectory && name.endsWith('.d.ts')) return false
+        return true
+      }
     }
 
-    await Promise.all(workerPromises)
+    const babelTransformer = getBabelTransformer(pool)
+    const importRemover = getImportExtensionRemover(pool)
 
-    progressBar.stop()
+    console.log('Booted up.....')
 
-    console.log(
-      `\n${chalk.cyan('Converted')} ${chalk.bold.whiteBright(filesConvertedCount)} ${chalk.cyan('Typescript files out of')} ${chalk.bold.whiteBright(tsFiles.length)}`
-    )
+    await fileTransformer(options, [
+      importRemover,
+      babelTransformer
+    ])
 
+    // finally close the worker pool
+    await pool.close()
+
+    processFinished()
     Console.success('Project converted successfully')
 
-    if (!!filesThatFailedConversion.length) {
-      Console.error('Files which were not converted successfully: ')
-      filesThatFailedConversion.map((path: string) => {
-        Console.warning(path)
-      })
-    }
-    processFinished()
   } catch (error) {
     if (error instanceof Error) {
       Console.error(error.message)
@@ -209,9 +143,28 @@ async function runConversion (inputPath: string, outputPath: string) {
   }
 }
 
+// Argument parsing logic..
+const params: string[] = []
+const flags: string[] = []
+let filterPattern: string | undefined
 
-if (!!!params.length) {
-  if (!!!flags.length) {
+const args = process.argv.slice(2)
+for (let i = 0; i < args.length; i++) {
+  const arg = args[i]
+  if (arg.startsWith("-")) {
+    if (arg === '-f' || arg === '--filter') {
+      filterPattern = args[i + 1]
+      i++
+    } else {
+      flags.push(arg)
+    }
+  } else {
+    params.push(arg)
+  }
+}
+
+if (params.length === 0) {
+  if (flags.length === 0) {
     showHelp()
     process.exit(1)
   }
@@ -221,14 +174,16 @@ if (!!!params.length) {
   }
   if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
     showHelp()
+    // decides to show error or not
     process.exit((params.length !== 2) ? 1 : 0)
   }
 }
 else if (params.length !== 2) {
-  Console.error('Please provide only 2 arguments')
+  Console.error('Please provide input and output paths')
   showHelp()
   process.exit(1)
 }
 else {
-  runConversion(inputPath, outputPath)
+  const [input, output] = params
+  runConversion(input, output, filterPattern)
 }

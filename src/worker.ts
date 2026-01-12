@@ -1,45 +1,28 @@
-import { parentPort } from 'node:worker_threads'
-import fs from 'fs-extra'
-import { transformSync } from '@babel/core'
-// @ts-expect-error: No types required
-import babelTS from "@babel/preset-typescript"
-import * as path from 'node:path'
+import { parentPort } from 'worker_threads'
+import * as tasks from './helpers/worker-tasks.js'
 
-parentPort?.on('message', ({ filePath, inputPath, outputPath }: { filePath: string, inputPath: string, outputPath: string }) => {
+export type TaskName = keyof typeof tasks
+
+parentPort?.on('message', async (message) => {
+  const { id, content, filePath, taskName } = message
+  // console.info(`Worker ${id} received task ${taskName} for ${filePath}`)
+
   try {
-    const fileContent = fs.readFileSync(filePath, { encoding: 'utf-8' })
-    const typesRemovedContent = transformSync(fileContent, {
-      compact: false,
-      presets: [babelTS],
-      filename: filePath,
-      generatorOpts: { importAttributesKeyword: 'with' }
-    })
-
-    const relativePath = path.relative(inputPath, filePath);
-    let destinationFilePath = path.join(outputPath, relativePath);
-
-    if (filePath.endsWith('.tsx')) {
-      destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf('.tsx')) + '.jsx'
-    } else {
-      destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf('.ts')) + '.js'
+    const fn = tasks[taskName as TaskName]
+    if (!fn) {
+      throw new Error(`Unknown task: ${taskName}`)
     }
 
-    if (typesRemovedContent?.code) {
-      fs.outputFileSync(destinationFilePath, typesRemovedContent.code, { encoding: 'utf-8' })
-      parentPort?.postMessage({ status: 'success', path: filePath })
-    } else {
-      fs.copySync(filePath, destinationFilePath)
-      parentPort?.postMessage({ status: 'fail', path: filePath })
-    }
+    // this should support both sync and async transformers, fingers crossed
+    const result = await fn(content, filePath)
+
+    parentPort?.postMessage({ id, status: 'success', result })
   } catch (error) {
-    const relativePath = path.relative(inputPath, filePath);
-    let destinationFilePath = path.join(outputPath, relativePath);
-    if (filePath.endsWith('.tsx')) {
-      destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf('.tsx')) + '.jsx'
-    } else if (filePath.endsWith('.ts')) {
-      destinationFilePath = destinationFilePath.substring(0, destinationFilePath.lastIndexOf('.ts')) + '.js'
-    }
-    fs.copySync(filePath, destinationFilePath)
-    parentPort?.postMessage({ status: 'fail', path: filePath, error: (error as Error).message })
+    parentPort?.postMessage({
+      id,
+      status: 'error',
+      error: (error instanceof Error) ? error.message : 'Unknown error',
+      result: content
+    })
   }
 })
