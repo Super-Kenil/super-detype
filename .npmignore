@@ -1,9 +1,11 @@
+.idx
 package-lock.json
+bun.lock
 tsconfig.json
 rollup.config.mjs
 src
-.idx
 images
 docs
+test
 CHANGELOG.md
 .github
