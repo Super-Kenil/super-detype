@@ -1,12 +1,13 @@
 {
   "name": "super-detype",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "This package converts your WHOLE Typescript project to Javascript",
   "type": "module",
   "homepage": "https://super-detype.superkenil.com",
   "scripts": {
-    "test": "node ./dist/out.min.js ./src ./src-js",
-    "build": "esbuild ./src/app.ts --outfile=./dist/out.min.js --platform=node --bundle --minify --format=esm --packages=external && esbuild ./src/worker.ts --outfile=./dist/worker.js --platform=node --bundle --minify --format=esm --packages=external",
+    "test": "bun run ./dist/out.min.js test/input test/output",
+    "test:src": "bun run ./src/app.ts test/input test/output",
+    "build": "esbuild ./src/app.ts --outfile=./dist/out.min.js --platform=node --bundle --minify --format=esm --packages=external",
     "release": "npm run build && npm publish"
   },
   "displayName": "super-detype",
@@ -42,6 +43,7 @@
     "@babel/preset-typescript": "^7.28.5",
     "chalk": "4.1.2",
     "cli-progress": "^3.12.0",
+    "fast-glob": "^3.3.3",
     "fs-extra": "^11.3.3"
   },
   "devDependencies": {
