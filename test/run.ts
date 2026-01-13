@@ -1,4 +1,4 @@
-import { runConversion } from '../src/app'
+import { runConversion } from '../src'
 
 await runConversion({
   inputPath: "./input",

@@ -2,7 +2,8 @@
 
 import Chalk from 'chalk'
 import path from 'path'
-import { pathToFileURL } from 'url'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import packageJson from "../package.json" with { type: "json" }
 import { fileTransformer, type FileTransformerOptions, type TransformerFunction } from './helpers/file-transformer.js'
 import { getBabelTransformer, getImportExtensionRemover } from './helpers/transformers.js'
@@ -150,7 +151,9 @@ export const runConversion: RunConversionOptions = async (
 }
 
 // Argument parsing logic..
-const isMain = process.argv[1] && pathToFileURL(path.resolve(process.argv[1])).href === import.meta.url
+const currentFilePath = fs.realpathSync(fileURLToPath(import.meta.url))
+const scriptPathArg = process.argv[1] ? fs.realpathSync(path.resolve(process.argv[1])) : ''
+const isMain = scriptPathArg === currentFilePath
 
 if (isMain) {
   const params: string[] = []
@@ -172,32 +175,31 @@ if (isMain) {
     }
   }
 
-  if (params.length === 0) {
-    if (flags.length === 0) {
-      showHelp()
-      process.exit(1)
-    }
-    if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
-      Console.info('VERSION:', packageJson.version + ' ')
-      process.exit(0)
-    }
-    if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
-      showHelp()
-      // decides to show error or not
-      process.exit((params.length !== 2) ? 1 : 0)
-    }
+  // Handle version or help flags first
+  if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
+    Console.info('VERSION:', packageJson.version + ' ')
+    process.exit(0)
   }
-  else if (params.length !== 2) {
-    Console.error('Please provide input and output paths')
+
+  if (flags.some((flag: string) => helpFlagsList.includes(flag))) {
+    showHelp()
+    process.exit(0)
+  }
+
+  // Validate parameters
+  if (params.length !== 2) {
+    if (params.length > 0) {
+      Console.error('Please provide input and output paths')
+    }
     showHelp()
     process.exit(1)
   }
-  else {
-    const [input, output] = params
-    runConversion({
-      inputPath: input,
-      outputPath: output,
-      pattern: filterPattern
-    })
-  }
+
+  // Run conversion if valid 2 parameters are provided
+  const [input, output] = params
+  runConversion({
+    inputPath: input,
+    outputPath: output,
+    pattern: filterPattern
+  })
 }
