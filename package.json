@@ -1,6 +1,6 @@
 {
   "name": "super-detype",
-  "version": "2.1.4-experimental.2",
+  "version": "2.1.4",
   "description": "This package converts your WHOLE Typescript project to Javascript",
   "type": "module",
   "homepage": "https://super-detype.superkenil.com",
@@ -25,7 +25,9 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "converter",
     "typescript",
