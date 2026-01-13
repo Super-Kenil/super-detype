@@ -177,7 +177,7 @@ if (isMain) {
 
   // Handle version or help flags first
   if (flags.some((flag: string) => versionFlagsList.includes(flag))) {
-    Console.info('VERSION:', packageJson.version + ' ')
+    console.info(`v${packageJson.version}`)
     process.exit(0)
   }
 
