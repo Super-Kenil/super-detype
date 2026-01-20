@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 import packageJson from "../package.json" with { type: "json" }
 import { fileTransformer, type FileTransformerOptions, type TransformerFunction } from './helpers/file-transformer.js'
 import { getBabelTransformer, getImportExtensionRemover } from './helpers/transformers.js'
+import { removeDTDepsFromPackageJson } from './helpers/transformer-tasks.js'
 
 const chalk = new Chalk.Instance({ level: 1 })
 
@@ -123,7 +124,8 @@ export const runConversion: RunConversionOptions = async (
 
   const transformers = passedTransformers ?? [
     getImportExtensionRemover(),
-    getBabelTransformer()
+    getBabelTransformer(),
+    removeDTDepsFromPackageJson,
   ]
 
   try {

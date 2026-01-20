@@ -34,3 +34,11 @@ export const removeImportExtensions = (content: string, _filePath: string): stri
     })
     .join('\n')
 }
+
+export const removeDTDepsFromPackageJson = (content: string, _filePath: string): string => {
+  if (_filePath.endsWith('package.json')) {
+    return content.replace(/"@types\/.*/g, '')
+    .replace(/"typescript".*/g, '')
+  }
+  return content
+}

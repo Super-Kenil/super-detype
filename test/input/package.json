@@ -1,0 +1,23 @@
+{
+  "name": "test",
+  "version": "0.0.1",
+  "scripts": {
+    "test": "node -v"
+  },
+  "types": "./dist/index.d.ts",
+  "dependencies": {
+    "@babel/core": "^7.28.5",
+    "@babel/preset-typescript": "^7.28.5",
+    "chalk": "4.1.2",
+    "cli-progress": "^3.12.0",
+    "fast-glob": "^3.3.3",
+    "fs-extra": "^11.3.3"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.20.5",
+    "@types/fs-extra": "^11.0.4",
+    "esbuild": "^0.25.12",
+    "@types/cli-progress": "^3.11.6",
+    "typescript": "^5.9.3"
+  }
+}
