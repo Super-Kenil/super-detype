@@ -3,7 +3,7 @@
   "version": "2.2.0",
   "description": "This package converts your WHOLE Typescript project to Javascript",
   "type": "module",
-  "homepage": "https://super-detype.superkenil.com",
+  "homepage": "https://super-detype.sknl.dev",
   "scripts": {
     "test": "bun run ./dist/index.js test/input test/output",
     "test:src": "bun run ./src/index.ts test/input test/output",
@@ -40,7 +40,7 @@
   "preferGlobal": true,
   "author": {
     "name": "Super Kenil",
-    "url": "https://superkenil.com"
+    "url": "https://sknl.dev"
   },
   "repository": {
     "type": "git",

@@ -9,17 +9,23 @@
 <br/>
 Yeah. `tsc` does that, but it doesn't preserve formatting
 
-> Eg. If your homie doesn't know Typescript, don't go removing types file by file by yourself manually or use tools which removes types from the code you copy and paste into the tool, don't be an old hag, just download and use super-detype to remove types automatically from your whole project without any issues. 
+> Eg. If your homie doesn't know Typescript, don't go removing types file by file by yourself manually or use tools which removes types from the code you copy and paste into the tool, don't be an old hag, just download and use super-detype to remove types automatically from your whole project without any issues.
 
 
 ### How to Install
 
 
-!> **Its crucial to install it globally, so that you can use it from any directory of terminal** 
+!> **Its crucial to install it globally, so that you can use it from any directory of terminal**
 
 * In your terminal
 
 <!-- tabs:start -->
+
+#### **bun**
+
+```
+bun i -g super-detype
+```
 
 #### **npm**
 
@@ -42,11 +48,6 @@ pnpm add -g super-detype
 ```
 deno install -g npm:super-detype
 ```
-#### **bun**
-
-```
-bun i -g super-detype
-```
 
 <!-- tabs:end -->
 
@@ -67,15 +68,44 @@ npx super-detype "<typescript-project-directory>" "<output-directory>"
 super-detype "<typescript-project-directory>" "<output-directory>"
 ```
 
+### Programmatic Usage
+
+You can also use `super-detype` in your own scripts by importing `runConversion`.
+
+```typescript
+import { runConversion } from 'super-detype'
+
+// Basic usage
+await runConversion({
+  inputPath: './src',
+  outputPath: './src-js'
+})
+
+// Advanced usage with options
+await runConversion({
+  inputPath: './src',
+  outputPath: './dist',
+  // Glob pattern to match files (e.g. "**/*.ts")
+  pattern: '**/*.{ts,tsx}',
+  // Custom filter to skip files or directories
+  filter: (name, isDirectory) => {
+    if (name === 'node_modules') return false
+    return true
+  },
+  // Custom path transformer to change destination files
+  pathTransform: (relativePath, isDirectory) => {
+    if (isDirectory) return relativePath
+    return relativePath.replace('page.tsx', 'page.jsx')
+  }
+})
+```
+
 
 
 ### Supports
-1. React (Tested)
-2. Nextjs (Tested)
-3. Nodejs (Tested)
-4. Vite + HTML (Tested)
-5. Gatsby (!Tested)
-6. Angular (!Tested)
+1. React
+2. Nodejs
+3. Vite + HTML
 
 Does not support (yet):
 * Vue

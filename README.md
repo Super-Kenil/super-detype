@@ -2,7 +2,7 @@
 
 > ⭐️ Thanks **everyone** who has starred the repo, it means a lot!
 
-### [Read Docs](https://super-detype.superkenil.com/)
+### [Read Docs](https://super-detype.sknl.dev)
 
 > [!NOTE]
 > This transpiler converts your **WHOLE** Typescript project to Javascript:

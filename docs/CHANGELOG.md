@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v2.2.0
+| Title                                                                                              | type        |
+| -------------------------------------------------------------------------------------------------- | ----------- |
+| Feature: Added programmatic usage by importing `runConversion` from `super-detype`                 | feature     |
+| Bump: Internal dependencies for better performance and security                                    | bump        |
+
 ## v2.0.0
 | Title                                                                                              | type        |
 | -------------------------------------------------------------------------------------------------- | ----------- |
